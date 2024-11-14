@@ -1,11 +1,12 @@
-const jwt = require("jsonwebtoken");
+import pkg from 'jsonwebtoken';
+const { verify } = pkg;
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   const token = req.headers["authorization"];
 
   if (!token) return res.status(401).json({ message: "Unauthorize" });
 
-  jwt.verify(token, "your_secret_key", (err, decoded) => {
+  verify(token, "your_secret_key", (err, decoded) => {
     if (err) return res.status(403).json({ message: "Forbidden" });
 
     req.user = decoded;

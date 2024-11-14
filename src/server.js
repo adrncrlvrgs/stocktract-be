@@ -1,11 +1,12 @@
-const express = require("express");
-const userRoutes = require("routes/userRoutes");
-const errorMiddleware = require("middlewares/errorMiddleware");
+import express, { json } from "express";
+import userRoutes from "./routes/userRoutes.js";
+import errorMiddleware from "./middlewares/errorMiddleware.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+
+app.use(json());
 app.use("/api/users", userRoutes);
 
 app.use(errorMiddleware);
