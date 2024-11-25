@@ -1,10 +1,9 @@
-import 'module-alias/register.js';
+import "module-alias/register.js";
 import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
-import router from './routes/index.js'; 
-
+import router from "./routes/index.js";
 
 dotenv.config();
 
