@@ -1,4 +1,4 @@
-import { db } from "config/admin.config";
+import { db } from "../../config/admin.config.js";
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";

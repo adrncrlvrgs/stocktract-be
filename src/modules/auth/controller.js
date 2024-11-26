@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signUpUser } from './service';
+import { signInWithEmailAndPassword, signUpUser } from './service.js';
 
 // Controller to handle user sign-up
 export const signUp = async (req, res) => {
