@@ -42,7 +42,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
     const validPassword = await bcrypt.compare(password, userData.password);
 
     if (!validPassword) {
-      console.log("Password comparison failed"); 
+      console.log("Password comparison failed");
       throw new Error("Invalid credentials");
     }
 
