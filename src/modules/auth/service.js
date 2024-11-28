@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const signUpUser = async (props) => {
-  const { email, password, name, role } = props;
+export const signUpUser = async (data) => {
+  const { email, password, name, role } = data;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);

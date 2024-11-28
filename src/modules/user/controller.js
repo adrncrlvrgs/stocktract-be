@@ -8,7 +8,7 @@ import {
 } from "./service.js";
 
 // Create user
-export const createUser = async (req, res) => {
+export const create = async (req, res) => {
   try {
     const result = await createUser(req.body);
     return res.status(201).json(result);

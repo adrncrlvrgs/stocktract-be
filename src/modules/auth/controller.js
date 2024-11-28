@@ -18,9 +18,6 @@ export const signUp = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
-  console.log(password);
-
   try {
     const { token, userData } = await signInWithEmailAndPassword(
       email,
