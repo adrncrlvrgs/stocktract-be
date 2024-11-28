@@ -36,7 +36,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
       throw new Error("User not found");
     }
 
-    const userDoc = userSnapshot.docs[0]; // Get the first matching document
+    const userDoc = userSnapshot.docs[0];
     const userData = userDoc.data();
 
     const validPassword = await bcrypt.compare(password, userData.password);
@@ -55,7 +55,9 @@ export const signInWithEmailAndPassword = async (email, password) => {
       expiresIn: "1h",
     });
 
-    return { token, userData };
+    const { password: _, ...otherData } = userData;
+
+    return { token, userData: otherData };
   } catch (error) {
     console.error("Error signing in: ", error);
     throw new Error(error.message || "Failed to sign in");
@@ -70,8 +72,9 @@ export const getUserProfile = async (email) => {
       throw new Error("User not found");
     }
 
-    const userData = userDoc.data();
-    return { userData };
+    const { password: _, ...otherData } = userData;
+
+    return { userData: otherData };
   } catch (error) {
     throw new Error(error.message || "Error retrieving user profile");
   }

@@ -23,7 +23,7 @@ export const loginUser = async (req, res) => {
       email,
       password
     );
-    return res.status(200).json({ token, userData });
+    return res.status(200).json({ data: { token, userData } });
   } catch (error) {
     console.error(error);
     return res
@@ -34,10 +34,10 @@ export const loginUser = async (req, res) => {
 
 export const getUserProfileController = async (req, res) => {
   try {
-    const email = req.user.email; // `email` is available after the `authenticate` middleware
+    const email = req.user.email;
 
     const result = await getUserProfile(email);
-    return res.status(200).json(result); // Return the user data
+    return res.status(200).json({ data: { result } });
   } catch (error) {
     console.error(error);
     return res
