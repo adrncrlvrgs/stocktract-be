@@ -2,6 +2,7 @@ import {
   signInWithEmailAndPassword,
   signUpUser,
   getUserProfile,
+  refreshUserToken,
 } from "./service.js";
 
 export const signUp = async (req, res) => {
@@ -43,5 +44,26 @@ export const getUserProfileController = async (req, res) => {
     return res
       .status(500)
       .json({ error: error.message || "Internal Server Error" });
+  }
+};
+
+export const refreshToken = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Token must be provided" });
+  }
+  try {
+    const { token: newToken, userData } = await refreshUserToken(token);
+
+    return res.status(200).json({
+      message: "Token refreshed successfully",
+      data: { token: newToken, userData },
+    });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    return res.status(500).json({
+      error: error.message || "Internal Server Error",
+    });
   }
 };

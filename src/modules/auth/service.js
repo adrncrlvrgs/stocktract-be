@@ -80,4 +80,29 @@ export const getUserProfile = async (email) => {
   }
 };
 
-//refresh
+export const refreshUserToken = async (oldToken) => {
+  try {
+    const decoded = jwt.verify(oldToken, process.env.JWT_SECRET);
+    const userSnapshot = await db
+      .collection("users")
+      .where("email", "==", decoded.email)
+      .get();
+
+    if (userSnapshot.empty) {
+      throw new Error("User not found");
+    }
+
+    const userData = userSnapshot.docs[0].data();
+
+    const newToken = jwt.sign(
+      { email: decoded.email, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const { password, ...otherData } = userData;
+    return { token: newToken, userData: otherData };
+  } catch (error) {
+    throw new Error(error.message || "Failed to refresh token");
+  }
+};
