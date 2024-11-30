@@ -1,4 +1,3 @@
-// src/modules/users/service.js
 import { db } from "../../config/admin.config.js";
 
 export const createUser = async (props) => {

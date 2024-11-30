@@ -24,7 +24,7 @@ export const loginUser = async (req, res) => {
       email,
       password
     );
-    return res.status(200).json({ data: { token, userData } });
+    return res.status(200).json({ token, userData });
   } catch (error) {
     console.error(error);
     return res
@@ -37,8 +37,8 @@ export const getUserProfileController = async (req, res) => {
   try {
     const email = req.user.email;
 
-    const result = await getUserProfile(email);
-    return res.status(200).json({ data: { result } });
+    const data = await getUserProfile(email);
+    return res.status(200).json({ data });
   } catch (error) {
     console.error(error);
     return res
@@ -57,8 +57,8 @@ export const refreshToken = async (req, res) => {
     const { token: newToken, userData } = await refreshUserToken(token);
 
     return res.status(200).json({
-      message: "Token refreshed successfully",
-      data: { token: newToken, userData },
+      token: newToken,
+      userData,
     });
   } catch (error) {
     console.error("Error refreshing token:", error);

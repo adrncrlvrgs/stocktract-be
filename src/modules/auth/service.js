@@ -59,7 +59,6 @@ export const signInWithEmailAndPassword = async (email, password) => {
 
     return { token, userData: otherData };
   } catch (error) {
-    console.error("Error signing in: ", error);
     throw new Error(error.message || "Failed to sign in");
   }
 };

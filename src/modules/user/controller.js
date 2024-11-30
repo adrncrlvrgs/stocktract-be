@@ -1,4 +1,3 @@
-// src/modules/users/controller.js
 import {
   createUser,
   getAllUsers,
@@ -7,7 +6,7 @@ import {
   deleteUser,
 } from "./service.js";
 
-// Create user
+
 export const create = async (req, res) => {
   try {
     const result = await createUser(req.body);
@@ -20,7 +19,7 @@ export const create = async (req, res) => {
   }
 };
 
-// Get all users
+
 export const getUsers = async (req, res) => {
   try {
     const users = await getAllUsers();
@@ -33,7 +32,6 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// Get user by ID
 export const getUser = async (req, res) => {
   const { userId } = req.params;
 
@@ -48,7 +46,6 @@ export const getUser = async (req, res) => {
   }
 };
 
-// Update user
 export const updateUserDetails = async (req, res) => {
   const { userId } = req.params;
   const { name, role } = req.body;
@@ -64,7 +61,6 @@ export const updateUserDetails = async (req, res) => {
   }
 };
 
-// Delete user
 export const removeUser = async (req, res) => {
   const { userId } = req.params;
 
