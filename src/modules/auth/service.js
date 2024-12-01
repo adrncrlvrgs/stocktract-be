@@ -6,15 +6,17 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const signUpUser = async (data) => {
-  const { email, password, name, role } = data;
+  const { userID, email, password, name, role } = data;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     await db.collection("users").add({
+      userID: userID,
       email,
       password: hashedPassword,
       name,
       role,
+      status: "Active",
       createdAt: new Date(),
     });
 
