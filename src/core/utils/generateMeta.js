@@ -41,7 +41,13 @@ export const generateMeta = async ({
       .offset(parseInt(offset, 10) || 0); 
 
     const snapshot = await query.get();
-    return snapshot.docs.map((doc) => doc.data());
+    return snapshot.docs.map((doc) => {
+      const userData = doc.data();
+      if (userData.hasOwnProperty('password')) {
+        delete userData.password; 
+      }
+      return userData;
+    });
   };
 
   if (search && searchFields.length > 0) {

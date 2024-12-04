@@ -86,7 +86,7 @@ export const refreshUserToken = async (oldToken) => {
   try {
     const decoded = jwt.verify(oldToken, process.env.JWT_SECRET);
     const userSnapshot = await db
-      .collection("users")
+      .collection("admin")
       .where("email", "==", decoded.email)
       .get();
 
