@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Middleware to authenticate JWT token
 export const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Get token from Authorization header
 

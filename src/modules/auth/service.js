@@ -49,6 +49,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
     }
 
     const payload = {
+      userId: userDoc.id,
       email,
       role: userData.role || "user",
     };

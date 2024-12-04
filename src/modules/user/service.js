@@ -19,11 +19,11 @@ export const createUser = async (props) => {
   }
 };
 
-export const getAllUsers = async () => {
+export const getAllUsers = () => {
   try {
-    const usersSnapshot = await db.collection("users").get();
-    const users = usersSnapshot.docs.map(doc => doc.data());
-    return users;
+    const usersSnapshot = db.collection("users");
+
+    return usersSnapshot;
   } catch (error) {
     throw new Error(error.message || "Error fetching users");
   }

@@ -5,7 +5,7 @@ import {
   updateUser,
   deleteUser,
 } from "./service.js";
-
+import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   try {
@@ -21,9 +21,19 @@ export const create = async (req, res) => {
 
 
 export const getUsers = async (req, res) => {
+
   try {
-    const users = await getAllUsers();
-    return res.status(200).json(users);
+      const { data, meta } = await generateMeta({
+        getData: getAllUsers,  
+        search: req.query.search,
+        limit: req.query.limit || 20,
+        offset: req.query.offset || 0,
+        orderBy: req.query.orderBy || 'createdAt',  
+        order: req.query.order || 'desc',  
+        searchFields: ['name',"userID"]
+      });
+  
+      return res.status(200).json({ data, meta }); 
   } catch (error) {
     console.error(error);
     return res
