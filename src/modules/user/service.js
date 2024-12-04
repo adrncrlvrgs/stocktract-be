@@ -19,9 +19,12 @@ export const createUser = async (props) => {
   }
 };
 
-export const getAllUsers = () => {
+export const getAllUsers = (authDocId) => {
   try {
-    const usersSnapshot = db.collection("users");
+    const usersSnapshot = db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("users");
 
     return usersSnapshot;
   } catch (error) {

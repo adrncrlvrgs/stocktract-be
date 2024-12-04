@@ -1,5 +1,6 @@
 /**
  * @param {Object} options
+ * @param {String} options.authDocId - The authenticated user's document ID to restrict access to their data
  * @param {Function} options.getData - Function to fetch data (e.g., getAllUsers)
  * @param {String} [options.search] - Optional search term to filter results
  * @param {Number} [options.limit] - Limit for pagination
@@ -10,12 +11,13 @@
  * @returns {Object} - Returns an object containing both data and meta
  */
 export const generateMeta = async ({
+  authDocId,
   getData,
   search,
-  limit = 10,
-  offset = 0,
-  orderBy = 'id',
-  order = 'asc',
+  limit,
+  offset,
+  orderBy,
+  order,
   searchFields = [],
 }) => {
   let results = [];
@@ -34,9 +36,9 @@ export const generateMeta = async ({
 
   const getResults = async (query) => {
     query = query
-      .orderBy(orderBy, order)
-      .limit(parseInt(limit, 10))
-      .offset(parseInt(offset, 10));
+      .orderBy(orderBy || "name", order || "asc") 
+      .limit(parseInt(limit, 10) || 20) 
+      .offset(parseInt(offset, 10) || 0); 
 
     const snapshot = await query.get();
     return snapshot.docs.map((doc) => doc.data());
@@ -45,9 +47,8 @@ export const generateMeta = async ({
   if (search && searchFields.length > 0) {
     const lowerSearch = search.toLowerCase();
 
-   
     for (const field of searchFields) {
-      let query = getData();
+      let query = getData(authDocId);
       query = buildQuery(query, field, lowerSearch);
       const data = await getResults(query);
       results = [...results, ...data];
@@ -55,8 +56,7 @@ export const generateMeta = async ({
 
     results = Array.from(new Set(results.map(JSON.stringify))).map(JSON.parse);
   } else {
-
-    const query = getData();
+    const query = getData(authDocId); // No search, just fetch the data
     results = await getResults(query);
   }
 

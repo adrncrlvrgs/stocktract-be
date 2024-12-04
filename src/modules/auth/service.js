@@ -30,7 +30,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
   try {
     // Query Firestore collection for the user based on email
     const userSnapshot = await db
-      .collection("users")
+      .collection("admin")
       .where("email", "==", email)
       .get();
 
