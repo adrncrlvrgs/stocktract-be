@@ -95,9 +95,8 @@ export const refreshUserToken = async (oldToken) => {
     }
 
     const userData = userSnapshot.docs[0].data();
-
     const newToken = jwt.sign(
-      { email: decoded.email, role: decoded.role },
+      { userId: decoded.userId, email: decoded.email, role: decoded.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
