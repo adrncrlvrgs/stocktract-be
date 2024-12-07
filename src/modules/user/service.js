@@ -1,15 +1,16 @@
 import { db } from "../../config/admin.config.js";
-
-export const createUser = async (props) => {
+import bcrypt from "bcrypt";
+export const createUser = async (props,authDocId) => {
   const { email, password, name, role } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.collection("users").add({
+    await db.collection("admin").doc(authDocId).collection("users").add({
       email,
       password: hashedPassword,
       name,
-      role,
+      role: "User",
+      status: "Active",
       createdAt: new Date(),
     });
 
