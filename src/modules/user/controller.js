@@ -43,10 +43,11 @@ export const getUsers = async (req, res) => {
 };
 
 export const getUser = async (req, res) => {
-  const { userId } = req.params;
+  const { userID } = req.params;
+  const authDocId = req.user.userId
 
   try {
-    const user = await getUserById(userId);
+    const user = await getUserById(userID, authDocId);
     return res.status(200).json(user);
   } catch (error) {
     console.error(error);

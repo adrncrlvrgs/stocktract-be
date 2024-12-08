@@ -1,6 +1,6 @@
 import { db } from "../../config/admin.config.js";
 import bcrypt from "bcrypt";
-export const createUser = async (props,authDocId) => {
+export const createUser = async (props, authDocId) => {
   const { email, password, name, role } = props;
 
   try {
@@ -33,17 +33,27 @@ export const getAllUsers = (authDocId) => {
   }
 };
 
-export const getUserById = async (userId) => {
+export const getUserById = async (userId, authDocId) => {
   try {
-    const userDoc = await db.collection("users").doc(userId).get();
-    if (!userDoc.exists) {
-      throw new Error("User not found");
+    const userIdAsNumber = Number(userId);
+    const userSnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("users")
+      .where("userID", "==", userIdAsNumber)
+      .get();
+
+    if (!userSnapshot.empty) {
+      const userDoc = userSnapshot.docs[0]; 
+      return userDoc.data(); 
+    } else {
+      throw new Error("No user found with that userID.");
     }
-    return userDoc.data();
   } catch (error) {
     throw new Error(error.message || "Error fetching user");
   }
 };
+
 
 export const updateUser = async (userId, props) => {
   const { name, role } = props;
