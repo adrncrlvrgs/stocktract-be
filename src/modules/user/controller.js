@@ -8,7 +8,7 @@ import {
 import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
-  const authDocId = req.user.userId
+  const authDocId = req.user.userId;
   try {
     const result = await createUser(req.body, authDocId);
     return res.status(201).json(result);
@@ -44,7 +44,7 @@ export const getUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
   const { userID } = req.params;
-  const authDocId = req.user.userId
+  const authDocId = req.user.userId;
 
   try {
     const user = await getUserById(userID, authDocId);
@@ -58,11 +58,11 @@ export const getUser = async (req, res) => {
 };
 
 export const updateUserDetails = async (req, res) => {
-  const { userId } = req.params;
-  const { name, role } = req.body;
+  const { userID } = req.params;
+  const authDocId = req.user.userId;
 
   try {
-    const result = await updateUser(userId, { name, role });
+    const result = await updateUser(authDocId, userID, req.body);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);

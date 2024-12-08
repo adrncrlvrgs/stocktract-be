@@ -44,8 +44,8 @@ export const getUserById = async (userId, authDocId) => {
       .get();
 
     if (!userSnapshot.empty) {
-      const userDoc = userSnapshot.docs[0]; 
-      return userDoc.data(); 
+      const userDoc = userSnapshot.docs[0];
+      return userDoc.data();
     } else {
       throw new Error("No user found with that userID.");
     }
@@ -54,16 +54,36 @@ export const getUserById = async (userId, authDocId) => {
   }
 };
 
-
-export const updateUser = async (userId, props) => {
-  const { name, role } = props;
+export const updateUser = async (authDocId, userId, props) => {
+  const { name, email, password } = props;
 
   try {
-    await db.collection("users").doc(userId).update({
+    const updateFields = {
       name,
-      role,
+      email,
       updatedAt: new Date(),
-    });
+    };
+
+    if (password && password !== "") {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateFields.password = hashedPassword;
+    }
+
+    const userIdAsNumber = Number(userId);
+    const userSnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("users")
+      .where("userID", "==", userIdAsNumber)
+      .get();
+
+    if (userSnapshot.empty) {
+      throw new Error("No user found with that userID.");
+    }
+
+    const userDoc = userSnapshot.docs[0];
+
+    await userDoc.ref.update(updateFields);
 
     return { message: "User updated successfully" };
   } catch (error) {
