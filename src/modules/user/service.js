@@ -1,7 +1,7 @@
 import { db } from "../../config/admin.config.js";
 import bcrypt from "bcrypt";
 export const createUser = async (props, authDocId) => {
-  const { email, password, name, role } = props;
+  const { email, password, name, userID, role } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -11,6 +11,7 @@ export const createUser = async (props, authDocId) => {
       name,
       role: "User",
       status: "Active",
+      userID,
       createdAt: new Date(),
     });
 
@@ -91,10 +92,26 @@ export const updateUser = async (authDocId, userId, props) => {
   }
 };
 
-export const deleteUser = async (userId) => {
+export const deleteUser = async (authDocId, userId) => {
   try {
-    await db.collection("users").doc(userId).delete();
-    return { message: "User deleted successfully" };
+    const userIdAsNumber = Number(userId);
+
+    const userSnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("users")
+      .where("userID", "==", userIdAsNumber)
+      .get();
+
+    if (!userSnapshot.empty) {
+      const userDoc = userSnapshot.docs[0];
+
+      await userDoc.ref.delete();
+
+      return { message: "User deleted successfully" };
+    } else {
+      throw new Error("No user found with that userID.");
+    }
   } catch (error) {
     throw new Error(error.message || "Error deleting user");
   }

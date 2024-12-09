@@ -73,10 +73,12 @@ export const updateUserDetails = async (req, res) => {
 };
 
 export const removeUser = async (req, res) => {
-  const { userId } = req.params;
+  const { userID } = req.params;
+  const authDocId = req.user.userId;
+
 
   try {
-    const result = await deleteUser(userId);
+    const result = await deleteUser(authDocId,userID);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
