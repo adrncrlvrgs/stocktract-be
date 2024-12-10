@@ -26,8 +26,8 @@ export const getUsers = async (req, res) => {
       authDocId: req.user.userId,
       getData: getAllUsers,
       search: req.query.search,
-      limit: req.query.limit || 20,
-      offset: req.query.offset || 0,
+      limit: req.query.limit || 10,
+      page: req.query.page || 1,
       orderBy: req.query.orderBy || "name",
       order: req.query.order || "asc",
       searchFields: ["name", "userID"],
@@ -76,9 +76,8 @@ export const removeUser = async (req, res) => {
   const { userID } = req.params;
   const authDocId = req.user.userId;
 
-
   try {
-    const result = await deleteUser(authDocId,userID);
+    const result = await deleteUser(authDocId, userID);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
