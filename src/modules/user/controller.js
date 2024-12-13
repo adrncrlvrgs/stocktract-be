@@ -21,15 +21,11 @@ export const create = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
-
-  console.log(req.query)
-  const searchKey = req.query.searchKey || 'search'; // fallback to 'search'
-  const searchQuery = req.query[searchKey] ? req.query[searchKey].trim() : "";
   try {
     const { data, meta } = await generateMeta({
       authDocId: req.user.userId,
       getData: getAllUsers,
-      search: searchQuery,
+      search: req.query.search,
       limit: req.query.limit || 10,
       page: req.query.page || 1,
       orderBy: req.query.orderBy || "name",
