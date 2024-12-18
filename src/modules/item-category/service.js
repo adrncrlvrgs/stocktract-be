@@ -1,5 +1,4 @@
 import { db } from "../../config/admin.config.js";
-import bcrypt from "bcrypt";
 
 export const createCategory = async (props, authDocId) => {
   const { test, categoryName } = props;
@@ -16,3 +15,16 @@ export const createCategory = async (props, authDocId) => {
     throw new Error(error.message || "Error creating user");
   }
 };
+
+export const getAllCategory = (authDocId)=>{
+  try {
+    const usersSnapshot = db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("category");
+
+    return usersSnapshot;
+  } catch (error) {
+    throw new Error(error.message || "Error fetching categories");
+  }
+}
