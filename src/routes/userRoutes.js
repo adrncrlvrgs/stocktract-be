@@ -5,7 +5,6 @@ import { authenticate } from "../core/middlewares/middleware.js";
 const router = express.Router();
 
 router.post('/addUser', authenticate, user.create);
-
 router.get('/', authenticate, user.getUsers);
 router.get('/:userID', authenticate, user.getUser);
 router.put('/:userID', authenticate, user.updateUserDetails);

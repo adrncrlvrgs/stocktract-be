@@ -1,7 +1,7 @@
 import { db } from "../../config/admin.config.js";
 
 export const createItem = async (props, authDocId) => {
-  const { test, category } = props;
+  const { categoryID, name, status } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
