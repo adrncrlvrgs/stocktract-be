@@ -49,3 +49,35 @@ export const getCategoryById = async (categoryId, authDocId) => {
     throw new Error(error.message || "Error fetching user");
   }
 };
+
+export const updateCategory = async (authDocId, categoryId, props) => {
+  const { name, status, } = props;
+
+  try {
+    const updateFields = {
+      name,
+      status,
+      updatedAt: new Date(),
+    };
+
+    const categoryIdAsNumber = Number(categoryId);
+    const categorySnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("category")
+      .where("categoryID", "==", categoryIdAsNumber)
+      .get();
+
+    if (categorySnapshot.empty) {
+      throw new Error("No category found with that categoryID.");
+    }
+
+    const categoryDoc = categorySnapshot.docs[0];
+
+    await categoryDoc.ref.update(updateFields);
+
+    return { message: "Category updated successfully" };
+  } catch (error) {
+    throw new Error(error.message || "Error updating category");
+  }
+};
