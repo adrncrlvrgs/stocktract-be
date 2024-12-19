@@ -1,22 +1,22 @@
 import { db } from "../../config/admin.config.js";
 
 export const createCategory = async (props, authDocId) => {
-  const { test, categoryName } = props;
+  const { name, categoryID, status } = props;
   try {
     await db.collection("admin").doc(authDocId).collection("category").add({
-      categoryName,
-      status: "Active",
+      name,
+      status,
       categoryID,
       createdAt: new Date(),
     });
 
-    return { message: "User created successfully" };
+    return { message: "Category created successfully" };
   } catch (error) {
     throw new Error(error.message || "Error creating user");
   }
 };
 
-export const getAllCategory = (authDocId)=>{
+export const getAllCategory = (authDocId) => {
   try {
     const usersSnapshot = db
       .collection("admin")
@@ -27,4 +27,4 @@ export const getAllCategory = (authDocId)=>{
   } catch (error) {
     throw new Error(error.message || "Error fetching categories");
   }
-}
+};
