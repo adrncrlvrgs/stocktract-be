@@ -51,7 +51,7 @@ export const getCategoryById = async (categoryId, authDocId) => {
 };
 
 export const updateCategory = async (authDocId, categoryId, props) => {
-  const { name, status, } = props;
+  const { name, status } = props;
 
   try {
     const updateFields = {
@@ -68,16 +68,39 @@ export const updateCategory = async (authDocId, categoryId, props) => {
       .where("categoryID", "==", categoryIdAsNumber)
       .get();
 
-    if (categorySnapshot.empty) {
+    if (!categorySnapshot.empty) {
+      const categoryDoc = categorySnapshot.docs[0];
+
+      await categoryDoc.ref.update(updateFields);
+      return { message: "Category updated successfully" };
+    } else {
       throw new Error("No category found with that categoryID.");
     }
-
-    const categoryDoc = categorySnapshot.docs[0];
-
-    await categoryDoc.ref.update(updateFields);
-
-    return { message: "Category updated successfully" };
   } catch (error) {
     throw new Error(error.message || "Error updating category");
+  }
+};
+
+export const deleteCategory = async (authDocId, categoryId) => {
+  try {
+    const categoryIdAsNumber = Number(categoryId);
+    const categorySnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("category")
+      .where("categoryID", "==", categoryIdAsNumber)
+      .get();
+
+    if (!categorySnapshot.empty) {
+      const categoryDoc = categorySnapshot.docs[0];
+
+      await categoryDoc.ref.delete();
+
+      return { message: "Category deleted successfully" };
+    } else {
+      throw new Error("No Category found with that categoryID.");
+    }
+  } catch (error) {
+    throw new Error(error.message || "Error deleting Category");
   }
 };

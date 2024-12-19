@@ -2,7 +2,8 @@ import {
   createCategory, 
   getAllCategory, 
   getCategoryById, 
-  updateCategory
+  updateCategory,
+  deleteCategory
 } from "./service.js";
 import { generateMeta } from "../../core/utils/generateMeta.js";
 
@@ -62,6 +63,21 @@ export const updateCategoryDetails = async (req, res) => {
 
   try {
     const result = await updateCategory(authDocId, categoryID, req.body);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ error: error.message || "Internal Server Error" });
+  }
+};
+
+export const removeCategory = async (req, res) => {
+  const { categoryID } = req.params;
+  const authDocId = req.user.userId;
+
+  try {
+    const result = await deleteCategory(authDocId, categoryID);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
