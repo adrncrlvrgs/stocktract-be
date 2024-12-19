@@ -28,3 +28,24 @@ export const getAllCategory = (authDocId) => {
     throw new Error(error.message || "Error fetching categories");
   }
 };
+
+export const getCategoryById = async (categoryId, authDocId) => {
+  try {
+    const categoryIdAsNumber = Number(categoryId);
+    const categorySnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("category")
+      .where("categoryID", "==", categoryIdAsNumber)
+      .get();
+
+    if (!categorySnapshot.empty) {
+      const categoryDoc = categorySnapshot.docs[0];
+      return categoryDoc.data();
+    } else {
+      throw new Error("No category found with that categoryID.");
+    }
+  } catch (error) {
+    throw new Error(error.message || "Error fetching user");
+  }
+};

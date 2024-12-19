@@ -1,4 +1,4 @@
-import { createCategory, getAllCategory } from "./service.js";
+import { createCategory, getAllCategory, getCategoryById } from "./service.js";
 import { generateMeta } from "../../core/utils/generateMeta.js";
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
@@ -27,6 +27,21 @@ export const getCategories = async (req, res) => {
     });
 
     return res.status(200).json({ data, meta });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ error: error.message || "Internal Server Error" });
+  }
+};
+
+export const getCategory = async (req, res) => {
+  const { categoryID } = req.params;
+  const authDocId = req.user.userId;
+
+  try {
+    const user = await getCategoryById(categoryID, authDocId);
+    return res.status(200).json(user);
   } catch (error) {
     console.error(error);
     return res

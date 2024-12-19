@@ -4,9 +4,9 @@ import { authenticate } from "../core/middlewares/middleware.js";
 
 const router = express.Router();
 
-router.post('/addCategory', authenticate, category.create);
-router.get('/', authenticate, category.getCategories);
-// router.get('/:userID', authenticate, user.getUser);
+router.post("/addCategory", authenticate, category.create);
+router.get("/", authenticate, category.getCategories);
+router.get("/:categoryID", authenticate, category.getCategory);
 // router.put('/:userID', authenticate, user.updateUserDetails);
 // router.delete('/:userID', authenticate, user.removeUser);
 
