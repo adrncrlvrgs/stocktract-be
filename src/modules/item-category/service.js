@@ -5,7 +5,7 @@ export const createCategory = async (props, authDocId) => {
   try {
     await db.collection("admin").doc(authDocId).collection("category").add({
       name,
-      status,
+      status: "Active",
       categoryID,
       createdAt: new Date(),
     });
@@ -18,12 +18,12 @@ export const createCategory = async (props, authDocId) => {
 
 export const getAllCategory = (authDocId) => {
   try {
-    const usersSnapshot = db
+    const categorySnapshot = db
       .collection("admin")
       .doc(authDocId)
       .collection("category");
 
-    return usersSnapshot;
+    return categorySnapshot;
   } catch (error) {
     throw new Error(error.message || "Error fetching categories");
   }
@@ -51,12 +51,11 @@ export const getCategoryById = async (categoryId, authDocId) => {
 };
 
 export const updateCategory = async (authDocId, categoryId, props) => {
-  const { name, status } = props;
+  const { name } = props;
 
   try {
     const updateFields = {
       name,
-      status,
       updatedAt: new Date(),
     };
 
