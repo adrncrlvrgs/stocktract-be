@@ -4,7 +4,6 @@ export const createItem = async (props, authDocId) => {
   const { itemID, category, name, quantity } = props;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
     await db.collection("admin").doc(authDocId).collection("items").add({
       itemID,
       category,
@@ -67,7 +66,7 @@ export const updateItem = async (authDocId, itemId, props) => {
     };
 
     const itemIdAsNumber = Number(itemId);
-    await db
+    const itemSnapshot = await db
       .collection("admin")
       .doc(authDocId)
       .collection("items")
