@@ -8,6 +8,6 @@ router.post("/addSale", authenticate, sales.create);
 router.get("/", authenticate, sales.getSales);
 router.get("/:saleID", authenticate, sales.getSale);
 router.put("/:saleID", authenticate, sales.updateSaleDetails);
-router.delete("/:saleID", authenticate, sales.removeSale);
+router.delete("/:saleID", authenticate, sales.deleteSaleDetails);
 
 export default router;
