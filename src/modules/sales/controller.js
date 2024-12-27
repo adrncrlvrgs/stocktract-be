@@ -31,7 +31,7 @@ export const getSales = async (req, res) => {
       page: req.query.page || 1,
       orderBy: req.query.orderBy || "saleID",
       order: req.query.order || "asc",
-      searchFields: ["saleID", "item"],
+      searchFields: ["item", "saleID"],
     });
 
     return res.status(200).json({ data, meta });

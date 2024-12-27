@@ -95,7 +95,7 @@ export const deleteSale = async (authDocId, saleId) => {
 
     if (!saleSnapshot.empty) {
       const saleDoc = saleSnapshot.docs[0];
-      await saleDoc.ref.update({ status: "Deleted" });
+      await saleDoc.ref.delete();
       return { message: "Sale deleted successfully" };
     } else {
       throw new Error("No sale found with that saleID.");
