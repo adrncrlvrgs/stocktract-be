@@ -61,6 +61,7 @@ export const updateSale = async (authDocId, saleId, props) => {
       item,
       quantity,
       totalAmount,
+      updatedAt: new Date(),
     };
 
     const saleIdAsNumber = Number(saleId);

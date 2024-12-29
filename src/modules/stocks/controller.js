@@ -1,17 +1,17 @@
 import {
-  createSale,
-  getAllSales,
-  getSaleById,
-  updateSale,
-  deleteSale,
-} from "./service.js";
+  createStock,
+  getAllStocks,
+  getStockById,
+  updateStock,
+  deleteStock,
+} from "./service";
 
-import { generateMeta } from "../../core/utils/generateMeta.js";
+import { generateMeta } from "../../core/utils/generateMeta";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
   try {
-    const result = await createSale(req.body, authDocId);
+    const result = await createStock(req.body, authDocId);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
@@ -21,17 +21,17 @@ export const create = async (req, res) => {
   }
 };
 
-export const getSales = async (req, res) => {
+export const getStocks = async (req, res) => {
   try {
     const { data, meta } = await generateMeta({
       authDocId: req.user.userId,
-      getData: getAllSales,
+      getData: getAllStocks,
       search: req.query.search,
       limit: req.query.limit || 10,
       page: req.query.page || 1,
-      orderBy: req.query.orderBy || "saleID",
+      orderBy: req.query.orderBy || "stockID",
       order: req.query.order || "asc",
-      searchFields: ["item", "saleID"],
+      searchFields: ["item", "stockID"],
     });
 
     return res.status(200).json({ data, meta });
@@ -43,13 +43,13 @@ export const getSales = async (req, res) => {
   }
 };
 
-export const getSale = async (req, res) => {
-  const { saleID } = req.params;
+export const getStock = async (req, res) => {
+  const { stockID } = req.params;
   const authDocId = req.user.userId;
 
   try {
-    const sale = await getSaleById(saleID, authDocId);
-    return res.status(200).json(sale);
+    const stock = await getStockById(stockID, authDocId);
+    return res.status(200).json(stock);
   } catch (error) {
     return res
       .status(500)
@@ -57,30 +57,28 @@ export const getSale = async (req, res) => {
   }
 };
 
-export const updateSaleDetails = async (req, res) => {
-  const { saleID } = req.params;
+export const updateStockDetails = async (req, res) => {
+  const { stockID } = req.params;
   const authDocId = req.user.userId;
 
   try {
-    const result = await updateSale(authDocId, saleID, req.body);
+    const result = await updateStock(authDocId, stockID, req.body);
     return res.status(200).json(result);
   } catch (error) {
-    console.error(error);
     return res
       .status(500)
       .json({ error: error.message || "Internal Server Error" });
   }
 };
 
-export const deleteSaleDetails = async (req, res) => {
-  const { saleID } = req.params;
+export const deleteStock = async (req, res) => {
+  const { stockID } = req.params;
   const authDocId = req.user.userId;
 
   try {
-    const result = await deleteSale(authDocId, saleID);
+    const result = await deleteStock(authDocId, stockID);
     return res.status(200).json(result);
   } catch (error) {
-    console.error(error);
     return res
       .status(500)
       .json({ error: error.message || "Internal Server Error" });
