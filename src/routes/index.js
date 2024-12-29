@@ -13,6 +13,6 @@ router.use("/users", userRoutes);
 router.use("/category", categoryRoutes);
 router.use("/items", itemRoutes);
 router.use("/sales", salesRoutes);
-router.use("/stock", stockRoutes);
+router.use("/stocks", stockRoutes);
 
 export default router;
