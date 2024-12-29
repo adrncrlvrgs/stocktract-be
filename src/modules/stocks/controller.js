@@ -4,9 +4,9 @@ import {
   getStockById,
   updateStock,
   deleteStock,
-} from "./service";
+} from "./service.js";
 
-import { generateMeta } from "../../core/utils/generateMeta";
+import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
@@ -71,7 +71,7 @@ export const updateStockDetails = async (req, res) => {
   }
 };
 
-export const deleteStock = async (req, res) => {
+export const removeStock = async (req, res) => {
   const { stockID } = req.params;
   const authDocId = req.user.userId;
 

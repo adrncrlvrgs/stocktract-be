@@ -1,4 +1,4 @@
-import { db } from "../../config/admin.config";
+import { db } from "../../config/admin.config.js";
 
 export const createStock = async (props, authDocId) => {
   const { companyName, item, quantity, price } = props;

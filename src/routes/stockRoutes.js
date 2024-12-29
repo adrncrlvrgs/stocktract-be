@@ -8,6 +8,6 @@ router.post("/addStock", authenticate, stockController.create);
 router.get("/", authenticate, stockController.getStocks);
 router.get("/:stockID", authenticate, stockController.getStock);
 router.put("/:stockID", authenticate, stockController.updateStockDetails);
-router.delete("/:stockID", authenticate, stockController.deleteStock);
+router.delete("/:stockID", authenticate, stockController.removeStock);
 
 export default router;
