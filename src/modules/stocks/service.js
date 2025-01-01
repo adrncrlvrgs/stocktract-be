@@ -56,14 +56,10 @@ export const getStockById = async (stockId, authDocId) => {
 };
 
 export const updateStock = async (authDocId, stockId, props) => {
-  const { companyName, item, quantity, price } = props;
-
+ 
   try {
     const updateFields = {
-      companyName,
-      item,
-      quantity,
-      price,
+      ...props,
       updatedAt: new Date(),
     };
 
