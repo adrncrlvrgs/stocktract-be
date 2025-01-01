@@ -1,7 +1,7 @@
 import { db } from "../../config/admin.config.js";
 
 export const createStock = async (props, authDocId) => {
-  const { stockID, supplier, item, quantity, category, totalCost } = props;
+  const { stockID, supplier, item, totalQuantity, category, totalCost } = props;
 
   try {
     await db.collection("admin").doc(authDocId).collection("stocks").add({
@@ -9,7 +9,7 @@ export const createStock = async (props, authDocId) => {
       supplier,
       item,
       category,
-      quantity,
+      totalQuantity,
       totalCost,
       status: "Active",
       createdAt: new Date(),

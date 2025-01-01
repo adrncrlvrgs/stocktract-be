@@ -4,14 +4,16 @@ export const createItem = async (props, authDocId) => {
   const { itemID, category, name, quantity } = props;
 
   try {
-    await db.collection("admin").doc(authDocId).collection("items").add({
-      itemID,
-      category,
-      name,
-      quantity,
-      status: "Active",
-      createdAt: new Date(),
-    });
+    await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("items")
+      .add({
+        itemID,
+        ...props,
+        status: "Active",
+        createdAt: new Date(),
+      });
 
     return { message: "Item created successfully" };
   } catch (error) {
@@ -58,10 +60,7 @@ export const updateItem = async (authDocId, itemId, props) => {
 
   try {
     const updateFields = {
-      name,
-      category,
-      quantity,
-      status: "Active",
+      ...props,
       updatedAt: new Date(),
     };
 
