@@ -1,7 +1,8 @@
 import { db } from "../../config/admin.config.js";
+import { updateStockQuantity } from "../stocks/service.js";
 
 export const createItem = async (props, authDocId) => {
-  const { itemID, category, name, quantity } = props;
+  const { itemID, quantity, stockID } = props;
 
   try {
     await db
@@ -10,11 +11,13 @@ export const createItem = async (props, authDocId) => {
       .collection("items")
       .add({
         itemID,
+        quantity: Number(quantity),
         ...props,
         status: "Active",
         createdAt: new Date(),
       });
 
+    await updateStockQuantity(authDocId, stockID, -Number(quantity));
     return { message: "Item created successfully" };
   } catch (error) {
     throw new Error(error.message || "Error creating item");

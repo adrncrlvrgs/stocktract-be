@@ -4,16 +4,20 @@ export const createStock = async (props, authDocId) => {
   const { stockID, supplier, item, totalQuantity, category, totalCost } = props;
 
   try {
-    await db.collection("admin").doc(authDocId).collection("stocks").add({
-      stockID,
-      supplier,
-      item,
-      category,
-      totalQuantity,
-      totalCost,
-      status: "Active",
-      createdAt: new Date(),
-    });
+    await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("stocks")
+      .add({
+        stockID,
+        supplier,
+        item,
+        category,
+        totalQuantity: Number(totalQuantity),
+        totalCost,
+        status: "Active",
+        createdAt: new Date(),
+      });
 
     return { message: "Stock created successfully" };
   } catch (error) {
@@ -56,7 +60,6 @@ export const getStockById = async (stockId, authDocId) => {
 };
 
 export const updateStock = async (authDocId, stockId, props) => {
- 
   try {
     const updateFields = {
       ...props,
@@ -100,5 +103,32 @@ export const deleteStock = async (authDocId, stockId) => {
     }
   } catch (error) {
     throw new Error(error.message || "Error deleting stock");
+  }
+};
+
+export const updateStockQuantity = async (authDocId, stockId, quantity) => {
+  try {
+    const stockSnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("stocks")
+      .where("stockID", "==", Number(stockId))
+      .get();
+
+    if (!stockSnapshot.empty) {
+      const stockDoc = stockSnapshot.docs[0];
+      const currentStock = stockDoc.data().totalQuantity;
+      const newStock = currentStock + quantity;
+
+      if (newStock < 0) {
+        throw new Error("Insufficient stock available");
+      }
+
+      await stockDoc.ref.update({ totalQuantity: newStock });
+    } else {
+      throw new Error("Stock item not found");
+    }
+  } catch (error) {
+    throw new Error(error.message || "Error updating stock quantity");
   }
 };
