@@ -1,10 +1,21 @@
 import { db } from "../../config/admin.config.js";
 import bcrypt from "bcrypt";
+import { uploadImageToCloudinary } from "../../core/utils/imageHandler.js";
+
 export const createUser = async (props, authDocId) => {
-  const { email, password, name, userID, role } = props;
+  const { email, password, name, userID, role, profileImagePath } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    let profileImageUrl = "";
+
+    if (profileImagePath) {
+      profileImageUrl = await uploadImageToCloudinary(
+        profileImagePath,
+        "profileImages"
+      );
+    }
     await db.collection("admin").doc(authDocId).collection("users").add({
       email,
       password: hashedPassword,
@@ -12,6 +23,7 @@ export const createUser = async (props, authDocId) => {
       role: "User",
       status: "Active",
       userID,
+      profileImageUrl,
       createdAt: new Date(),
     });
 

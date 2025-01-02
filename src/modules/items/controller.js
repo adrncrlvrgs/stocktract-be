@@ -28,9 +28,9 @@ export const getItems = async (req, res) => {
       search: req.query.search,
       limit: req.query.limit || 10,
       page: req.query.page || 1,
-      orderBy: req.query.orderBy || "name",
+      orderBy: req.query.orderBy || "item",
       order: req.query.order || "asc",
-      searchFields: ["name", "itemID"],
+      searchFields: ["item", "itemID"],
     });
 
     return res.status(200).json({ data, meta });
