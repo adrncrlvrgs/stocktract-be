@@ -11,7 +11,7 @@ const testUpdateUser = async () => {
     name: "Updated Test User",
     email: "updatedtestuser@example.com",
     password: "newpassword123",
-    profileImagePath: "./pic.png" // Replace with the path to a new test image
+    profileImagePath: "./update.png" // Replace with the path to a new test image
   };
 
   try {

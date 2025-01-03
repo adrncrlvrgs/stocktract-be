@@ -4,9 +4,7 @@ import {
   uploadImageToCloudinary,
   updateImageInCloudinary,
   deleteImageFromCloudinary,
-  getImageDetailsFromCloudinary,
 } from "../../core/utils/imageHandler.js";
-import fs from "fs";
 import path from "path";
 
 export const createUser = async (props, authDocId) => {
@@ -114,6 +112,7 @@ export const updateUser = async (authDocId, userId, props) => {
         .slice(-2)
         .join("/")
         .split(".")[0];
+
       const newImageFileName = path.basename(profileImagePath);
       const existingImageFileName = path.basename(userData.profileImageUrl);
 
@@ -123,6 +122,8 @@ export const updateUser = async (authDocId, userId, props) => {
           profileImagePath
         );
         updateFields.profileImageUrl = newProfileImageUrl;
+      }else{
+        console.log("No new profile image uploaded")
       }
     }
 
