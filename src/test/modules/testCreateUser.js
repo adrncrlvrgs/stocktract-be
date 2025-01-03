@@ -1,4 +1,4 @@
-import { createUser } from "./src/modules/user/service.js";
+import { createUser } from "../../modules/user/service.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -8,7 +8,7 @@ const testCreateUser = async () => {
     email: "testuser@example.com",
     password: "password123",
     name: "Test User",
-    userID: "testuser123",
+    userID: "101010",
     role: "User",
     profileImagePath: "./1x1_pic.png" // Replace with the path to a test image
   };

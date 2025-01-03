@@ -23,16 +23,20 @@ export const createUser = async (props, authDocId) => {
         "profileImages"
       );
     }
-    await db.collection("admin").doc(authDocId).collection("users").add({
-      email,
-      password: hashedPassword,
-      name,
-      role: "User",
-      status: "Active",
-      userID,
-      profileImageUrl,
-      createdAt: new Date(),
-    });
+    await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("users")
+      .add({
+        email,
+        password: hashedPassword,
+        name,
+        role: "User",
+        status: "Active",
+        userID: Number(userID),
+        profileImageUrl,
+        createdAt: new Date(),
+      });
 
     return { message: "User created successfully" };
   } catch (error) {
@@ -105,7 +109,11 @@ export const updateUser = async (authDocId, userId, props) => {
     const userData = userDoc.data();
 
     if (profileImagePath) {
-      const publicId = userData.profileImageUrl.split("/").pop().split(".")[0];
+      const publicId = userData.profileImageUrl
+        .split("/")
+        .slice(-2)
+        .join("/")
+        .split(".")[0];
       const newImageFileName = path.basename(profileImagePath);
       const existingImageFileName = path.basename(userData.profileImageUrl);
 
@@ -144,7 +152,8 @@ export const deleteUser = async (authDocId, userId) => {
       if (userData.profileImageUrl) {
         const publicId = userData.profileImageUrl
           .split("/")
-          .pop()
+          .slice(-2)
+          .join("/")
           .split(".")[0];
         await deleteImageFromCloudinary(publicId);
       }
