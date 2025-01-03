@@ -49,3 +49,17 @@ export const deleteImageFromCloudinary = async (publicId) => {
     throw new Error(`Failed to delete image: ${error.message}`);
   }
 };
+
+/**
+ * @param {string} publicId - The public ID of the image.
+ * @returns {Promise<object>} - The details of the image.
+ */
+
+export const getImageDetailsFromCloudinary = async (publicId) => {
+  try {
+    const result = await cloudinary.api.resource(publicId);
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to get image details: ${error.message}`);
+  }
+};
