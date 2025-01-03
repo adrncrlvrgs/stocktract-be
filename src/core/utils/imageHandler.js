@@ -19,3 +19,33 @@ export const uploadImageToCloudinary = async (imagePath, folder) => {
     throw new Error(`Failed to upload image: ${error.message}`);
   }
 };
+
+/**
+ * @param {string} publicId - The public ID of the image to update.
+ * @param {string} imagePath - The local path of the new image to upload.
+ * @returns {Promise<string>} - The URL of the updated image.
+ */
+export const updateImageInCloudinary = async (publicId, imagePath) => {
+  try {
+    const result = await cloudinary.uploader.upload(imagePath, {
+      public_id: publicId,
+      overwrite: true,
+    });
+
+    return result.secure_url;
+  } catch (error) {
+    throw new Error(`Failed to update image: ${error.message}`);
+  }
+};
+
+/**
+ * @param {string} publicId - The public ID of the image to delete.
+ * @returns {Promise<void>}
+ */
+export const deleteImageFromCloudinary = async (publicId) => {
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    throw new Error(`Failed to delete image: ${error.message}`);
+  }
+};
