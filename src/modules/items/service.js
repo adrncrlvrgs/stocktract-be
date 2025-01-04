@@ -1,6 +1,11 @@
 import { db } from "../../config/admin.config.js";
 import { updateStockQuantity } from "../stocks/service.js";
-import { uploadImageToCloudinary } from "../../core/utils/imageHandler.js";
+import {
+  uploadImageToCloudinary,
+  updateImageInCloudinary,
+  deleteImageFromCloudinary,
+} from "../../core/utils/imageHandler.js";
+import path from "path";
 
 export const createItem = async (props, authDocId) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
@@ -21,7 +26,7 @@ export const createItem = async (props, authDocId) => {
       .collection("items")
       .add({
         itemID,
-        imageUrls,        
+        imageUrls,
         quantity: Number(quantity),
         ...rest,
         status: "Active",
@@ -70,11 +75,11 @@ export const getItemById = async (itemId, authDocId) => {
 };
 
 export const updateItem = async (authDocId, itemId, props) => {
-  const { name, category, quantity } = props;
+  const { imagePaths, ...rest } = props;
 
   try {
     const updateFields = {
-      ...props,
+      ...rest,
       updatedAt: new Date(),
     };
 
@@ -86,14 +91,44 @@ export const updateItem = async (authDocId, itemId, props) => {
       .where("itemID", "==", itemIdAsNumber)
       .get();
 
-    if (!itemSnapshot.empty) {
-      const itemDoc = itemSnapshot.docs[0];
-      await itemDoc.ref.update(updateFields);
-      return { message: "Item updated successfully" };
-    } else {
+    if (itemSnapshot.empty) {
       throw new Error("No item found with that itemID.");
     }
+
+    const itemDoc = itemSnapshot.docs[0];
+    const itemData = itemDoc.data();
+
+    if (imagePaths && imagePaths.length > 0) {
+      const existingImageUrls = itemData.imageUrls || [];
+      const publicIds = existingImageUrls.map(
+        (url) => url.split("/").slice(-2).join("/").split(".")[0]
+      );
+
+      const newImageUrls = await Promise.all(
+        imagePaths.map((imagePath, index) => {
+          if (index < publicIds.length) {
+            return updateImageInCloudinary(publicIds[index], imagePath);
+          } else {
+            return uploadImageToCloudinary(imagePath, "itemImages");
+          }
+        })
+      );
+
+      if (imagePaths.length < existingImageUrls.length) {
+        const extraPublicIds = publicIds.slice(imagePaths.length);
+        await Promise.all(
+          extraPublicIds.map((publicId) => deleteImageFromCloudinary(publicId))
+        );
+      }
+
+      updateFields.imageUrls = newImageUrls;
+    }
+
+    await itemDoc.ref.update(updateFields);
+
+    return { message: "Item updated successfully" };
   } catch (error) {
+    console.error("Error updating item:", error.message);
     throw new Error(error.message || "Error updating item");
   }
 };
@@ -101,6 +136,7 @@ export const updateItem = async (authDocId, itemId, props) => {
 export const deleteItem = async (authDocId, itemId) => {
   try {
     const itemIdAsNumber = Number(itemId);
+
     const itemSnapshot = await db
       .collection("admin")
       .doc(authDocId)
@@ -110,8 +146,20 @@ export const deleteItem = async (authDocId, itemId) => {
 
     if (!itemSnapshot.empty) {
       const itemDoc = itemSnapshot.docs[0];
+      const itemData = itemDoc.data();
+
+      if (itemData.imageUrls && itemData.imageUrls.length > 0) {
+        const publicIds = itemData.imageUrls.map(
+          (url) => url.split("/").slice(-2).join("/").split(".")[0]
+        );
+        await Promise.all(
+          publicIds.map((publicId) => deleteImageFromCloudinary(publicId))
+        );
+      }
+
       await itemDoc.ref.delete();
-      return { message: "Item deleted successfully" };
+
+      return { message: "Item and images deleted successfully" };
     } else {
       throw new Error("No item found with that itemID.");
     }
