@@ -9,7 +9,6 @@ const testDeleteItem = async () => {
 
   try {
     const result = await deleteItem(authDocId, itemId);
-    console.log(result);
   } catch (error) {
     console.error("Error deleting item:", error.message);
   }

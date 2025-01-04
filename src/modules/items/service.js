@@ -167,3 +167,33 @@ export const deleteItem = async (authDocId, itemId) => {
     throw new Error(error.message || "Error deleting item");
   }
 };
+
+export const updateItemQuantity = async (authDocId, itemId, quantity) => {
+  try {
+    const itemIdAsNumber = Number(itemId);
+
+    const itemSnapshot = await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("items")
+      .where("itemID", "==", itemIdAsNumber)
+      .get();
+
+    if (!itemSnapshot.empty) {
+      const itemDoc = itemSnapshot.docs[0];
+      const itemData = itemDoc.data();
+      const currentQuantity = itemData.quantity;
+      const newQuantity = currentQuantity + Number(quantity);
+
+      if (newQuantity < 0) {
+        throw new Error("Insufficient quantity available");
+      }
+
+      await itemDoc.ref.update({ quantity: newQuantity });
+    } else {
+      throw new Error("Item not found");
+    }
+  } catch (error) {
+    throw new Error(error.message || "Error updating item quantity");
+  }
+}

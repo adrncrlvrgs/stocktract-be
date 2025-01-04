@@ -1,7 +1,8 @@
 import { db } from "../../config/admin.config.js";
+import { updateItemQuantity } from "../items/service.js";
 
 export const createStock = async (props, authDocId) => {
-  const { stockID, supplier, item, totalQuantity, category, totalCost } = props;
+  const { stockID, supplier, item, totalQuantity, category, totalCost, ...rest } = props;
 
   try {
     await db
@@ -16,8 +17,11 @@ export const createStock = async (props, authDocId) => {
         totalQuantity: Number(totalQuantity),
         totalCost,
         status: "Active",
+        ...rest,
         createdAt: new Date(),
       });
+
+    await updateItemQuantity(authDocId, item, Number(totalQuantity));
 
     return { message: "Stock created successfully" };
   } catch (error) {
