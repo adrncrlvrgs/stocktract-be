@@ -5,6 +5,7 @@ import categoryRoutes from "./categoryRoutes.js";
 import itemRoutes from "./itemsRoutes.js";
 import salesRoutes from "./salesRoutes.js";
 import stockRoutes from "./stockRoutes.js";
+import activityLogRoutes from "./activityLogRoutes.js";
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/category", categoryRoutes);
 router.use("/items", itemRoutes);
 router.use("/sales", salesRoutes);
 router.use("/stocks", stockRoutes);
+router.use("/activitylog", activityLogRoutes);
 
 export default router;
