@@ -183,7 +183,7 @@ export const updateItemQuantity = async (authDocId, itemId, quantity) => {
       const itemDoc = itemSnapshot.docs[0];
       const itemData = itemDoc.data();
       const currentQuantity = itemData.quantity;
-      const newQuantity = currentQuantity + Number(quantity);
+      const newQuantity = (currentQuantity || 0) + Number(quantity);
 
       if (newQuantity < 0) {
         throw new Error("Insufficient quantity available");

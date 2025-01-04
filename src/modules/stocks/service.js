@@ -120,7 +120,7 @@ export const updateStockQuantity = async (authDocId, stockId, quantity) => {
     if (!stockSnapshot.empty) {
       const stockDoc = stockSnapshot.docs[0];
       const currentStock = stockDoc.data().totalQuantity;
-      const newStock = currentStock + quantity;
+      const newStock = (currentStock || 0) + quantity;
 
       if (newStock < 0) {
         throw new Error("Insufficient stock available");
