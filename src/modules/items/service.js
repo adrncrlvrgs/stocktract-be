@@ -1,18 +1,29 @@
 import { db } from "../../config/admin.config.js";
 import { updateStockQuantity } from "../stocks/service.js";
+import { uploadImageToCloudinary } from "../../core/utils/imageHandler.js";
 
 export const createItem = async (props, authDocId) => {
-  const { itemID, quantity, stockID } = props;
+  const { itemID, stockID, quantity, imagePaths, ...rest } = props;
 
   try {
+    let imageUrls = [];
+
+    if (imagePaths && imagePaths.length > 0) {
+      imageUrls = await Promise.all(
+        imagePaths.map((imagePath) =>
+          uploadImageToCloudinary(imagePath, "itemImages")
+        )
+      );
+    }
     await db
       .collection("admin")
       .doc(authDocId)
       .collection("items")
       .add({
         itemID,
+        imageUrls,        
         quantity: Number(quantity),
-        ...props,
+        ...rest,
         status: "Active",
         createdAt: new Date(),
       });
