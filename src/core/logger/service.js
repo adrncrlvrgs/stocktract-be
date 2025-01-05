@@ -1,7 +1,7 @@
 import { db } from "../../config/admin.config.js";
 
 export const logActivity = async (props, authDocId) => {
-  const { logID ,userID, action, details } = props;
+  const { logID, userID, action, details } = props;
   try {
     const log = {
       logID,
@@ -10,7 +10,11 @@ export const logActivity = async (props, authDocId) => {
       details,
       timestamp: new Date(),
     };
-    await db.collection("activityLogs").add(log);
+    await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("activityLogs")
+      .add(log);
     return { message: "Activity logged successfully" };
   } catch (error) {
     throw new Error(error.message || "Error logging activity");

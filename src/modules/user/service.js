@@ -6,18 +6,20 @@ import {
   deleteImageFromCloudinary,
 } from "../../core/utils/imageHandler.js";
 import path from "path";
+import { fileToBuffer } from "../../core/utils/fileToBuffer.js";
 
 export const createUser = async (props, authDocId) => {
-  const { email, password, name, userID, role, profileImagePath } = props;
+  const { email, password, name, userID, role, profileImage } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let profileImageUrl = "";
 
-    if (profileImagePath) {
+    if (profileImage) {
+      const buffer = Buffer.from(profileImage, "base64");
       profileImageUrl = await uploadImageToCloudinary(
-        profileImagePath,
+        buffer,
         "profileImages"
       );
     }
