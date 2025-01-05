@@ -1,6 +1,6 @@
 import { logActivity, getActivityLogs } from "./service.js";
 
-export const logActivity = async (req, res) => {
+export const createlogActivity = async (req, res) => {
   try {
     const result = await logActivity(req.body);
     return res.status(201).json(result);
@@ -12,7 +12,7 @@ export const logActivity = async (req, res) => {
   }
 };
 
-export const getActivityLogs = async (req, res) => {
+export const getAllActivityLogs = async (req, res) => {
   try {
     const { data, meta } = await generateMeta({
       authDocId: req.user.userId,

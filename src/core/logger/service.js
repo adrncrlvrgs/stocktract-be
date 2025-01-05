@@ -1,4 +1,4 @@
-import { db } from "../../config/admin.config";
+import { db } from "../../config/admin.config.js";
 
 export const logActivity = async (props, authDocId) => {
   const { logID ,userID, action, details } = props;
