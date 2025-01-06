@@ -2,7 +2,7 @@ import { db } from "../../config/admin.config.js";
 import { updateItemQuantity } from "../items/service.js";
 
 export const createSale = async (props, authDocId) => {
-  const { saleID, item, quantity, totalAmount } = props;
+  const { saleID, itemID, item, quantity, totalAmount } = props;
 
   try {
     await db.collection("admin").doc(authDocId).collection("sales").add({
@@ -14,7 +14,7 @@ export const createSale = async (props, authDocId) => {
       createdAt: new Date(),
     });
 
-    await updateItemQuantity(authDocId, item, -Number(quantity));
+    await updateItemQuantity(authDocId, itemID, -Number(quantity));
 
     return { message: "Sale created successfully" };
   } catch (error) {
