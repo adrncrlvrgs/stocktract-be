@@ -6,17 +6,15 @@ import streamifier from "streamifier";
  * @param {string} folder - The destination folder in Cloudinary.
  * @returns {Promise<string|string[]>} - The URL(s) of the uploaded image(s).
  */
-export const uploadImageToCloudinary = async (files, folder) => {
+export const uploadImageToCloudinary = async (files, folder, id) => {
   try {
     if (Array.isArray(files)) {
-      // Handle multiple files
       const uploadPromises = files.map((file) => {
         return new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
             {
               folder,
-              use_filename: true,
-              unique_filename: false,
+              public_id: id,
               overwrite: true,
             },
             (error, result) => {
@@ -28,7 +26,6 @@ export const uploadImageToCloudinary = async (files, folder) => {
             }
           );
 
-          // Create a readable stream from the Buffer
           streamifier.createReadStream(file).pipe(uploadStream);
         });
       });
@@ -40,8 +37,7 @@ export const uploadImageToCloudinary = async (files, folder) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder,
-            use_filename: true,
-            unique_filename: false,
+            public_id: id,
             overwrite: true,
           },
           (error, result) => {
@@ -52,7 +48,6 @@ export const uploadImageToCloudinary = async (files, folder) => {
             }
           }
         );
-
 
         streamifier.createReadStream(files).pipe(uploadStream);
       });

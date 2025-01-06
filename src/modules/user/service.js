@@ -8,20 +8,15 @@ import {
 import path from "path";
 import { fileToBuffer } from "../../core/utils/fileToBuffer.js";
 
-export const createUser = async (props, authDocId) => {
-  const { email, password, name, userID, role, profileImage } = props;
+export const createUser = async (props, authDocId, file) => {
+  const { email, password, name, userID, role, } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let profileImageUrl = "";
-
-    if (profileImage) {
-      const buffer = Buffer.from(profileImage, "base64");
-      profileImageUrl = await uploadImageToCloudinary(
-        buffer,
-        "profileImages"
-      );
+    if (file) {
+      profileImageUrl = await uploadImageToCloudinary(file.buffer, "profileImages", userID);
     }
     await db
       .collection("admin")
