@@ -62,9 +62,10 @@ export const getUser = async (req, res) => {
 export const updateUserDetails = async (req, res) => {
   const { userID } = req.params;
   const authDocId = req.user.userId;
+  const file = req.file; 
 
   try {
-    const result = await updateUser(authDocId, userID, req.body);
+    const result = await updateUser(authDocId, userID, req.body,file);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);

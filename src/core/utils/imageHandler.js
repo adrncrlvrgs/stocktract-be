@@ -58,7 +58,7 @@ export const uploadImageToCloudinary = async (files, folder, id) => {
 };
 
 /**
- * @param {string|string[]} publicIds - The public ID(s) of the image(s) to update.
+ * @param {Buffer|Buffer[]} publicIds - The public ID(s) of the image(s) to update.
  * @param {File|File[]} files - The File object(s) of the new image(s) to upload.
  * @returns {Promise<string|string[]>} - The URL(s) of the updated image(s).
  */
@@ -68,7 +68,10 @@ export const updateImageInCloudinary = async (publicIds, files) => {
       const updatePromises = files.map((file, index) => {
         return new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
-            { public_id: publicIds[index], overwrite: true },
+            {
+              public_id: publicIds[index],
+              overwrite: true,
+            },
             (error, result) => {
               if (error) {
                 reject(error);
@@ -78,8 +81,7 @@ export const updateImageInCloudinary = async (publicIds, files) => {
             }
           );
 
-          // Convert the file buffer to a stream and pipe it to Cloudinary
-          streamifier.createReadStream(file.buffer).pipe(uploadStream);
+          streamifier.createReadStream(file).pipe(uploadStream);
         });
       });
 
@@ -88,7 +90,10 @@ export const updateImageInCloudinary = async (publicIds, files) => {
     } else {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-          { public_id: publicIds, overwrite: true },
+          {
+            public_id: publicIds,
+            overwrite: true,
+          },
           (error, result) => {
             if (error) {
               reject(error);
@@ -98,7 +103,7 @@ export const updateImageInCloudinary = async (publicIds, files) => {
           }
         );
 
-        streamifier.createReadStream(files.buffer).pipe(uploadStream);
+        streamifier.createReadStream(files).pipe(uploadStream);
       });
     }
   } catch (error) {

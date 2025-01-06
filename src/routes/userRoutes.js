@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/addUser', authenticate, upload.single("profileImagePath"), user.create);
 router.get('/', authenticate, user.getUsers);
 router.get('/:userID', authenticate, user.getUser);
-router.put('/:userID', authenticate, user.updateUserDetails);
+router.put('/:userID', authenticate, upload.single("profileImagePath"), user.updateUserDetails);
 router.delete('/:userID', authenticate, user.removeUser);
 
 export default router;

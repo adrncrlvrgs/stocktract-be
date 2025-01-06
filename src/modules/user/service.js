@@ -6,17 +6,20 @@ import {
   deleteImageFromCloudinary,
 } from "../../core/utils/imageHandler.js";
 import path from "path";
-import { fileToBuffer } from "../../core/utils/fileToBuffer.js";
 
 export const createUser = async (props, authDocId, file) => {
-  const { email, password, name, userID, role, } = props;
+  const { email, password, name, userID, role } = props;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let profileImageUrl = "";
     if (file) {
-      profileImageUrl = await uploadImageToCloudinary(file.buffer, "profileImages", userID);
+      profileImageUrl = await uploadImageToCloudinary(
+        file.buffer,
+        "profileImages",
+        userID
+      );
     }
     await db
       .collection("admin")
@@ -73,8 +76,8 @@ export const getUserById = async (userId, authDocId) => {
   }
 };
 
-export const updateUser = async (authDocId, userId, props) => {
-  const { name, email, password, profileImagePath } = props;
+export const updateUser = async (authDocId, userId, props, file) => {
+  const { name, email, password } = props;
 
   try {
     const updateFields = {
@@ -103,25 +106,18 @@ export const updateUser = async (authDocId, userId, props) => {
     const userDoc = userSnapshot.docs[0];
     const userData = userDoc.data();
 
-    if (profileImagePath) {
+    if (file) {
       const publicId = userData.profileImageUrl
         .split("/")
         .slice(-2)
         .join("/")
         .split(".")[0];
 
-      const newImageFileName = path.basename(profileImagePath);
-      const existingImageFileName = path.basename(userData.profileImageUrl);
-
-      if (newImageFileName !== existingImageFileName) {
-        const newProfileImageUrl = await updateImageInCloudinary(
-          publicId,
-          profileImagePath
-        );
-        updateFields.profileImageUrl = newProfileImageUrl;
-      }else{
-        console.log("No new profile image uploaded")
-      }
+      const newProfileImageUrl = await updateImageInCloudinary(
+        publicId,
+        file.buffer
+      );
+      updateFields.profileImageUrl = newProfileImageUrl;
     }
 
     await userDoc.ref.update(updateFields);
