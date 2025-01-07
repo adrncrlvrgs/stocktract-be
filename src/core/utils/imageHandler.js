@@ -9,12 +9,13 @@ import streamifier from "streamifier";
 export const uploadImageToCloudinary = async (files, folder, id) => {
   try {
     if (Array.isArray(files)) {
-      const uploadPromises = files.map((file) => {
+      const uploadPromises = files.map((file, index) => {
         return new Promise((resolve, reject) => {
+          const publicId = `${folder}/${id}/${id}_${index}`;
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder,
-              public_id: id,
+              folder: `${folder}/${id}`,
+              public_id: publicId,
               overwrite: true,
             },
             (error, result) => {

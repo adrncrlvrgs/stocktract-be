@@ -7,18 +7,14 @@ import {
 } from "../../core/utils/imageHandler.js";
 import path from "path";
 
-export const createItem = async (props, authDocId) => {
+export const createItem = async (props, authDocId, files) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
 
+  console.log(files);
   try {
-    let imageUrls = [];
-
-    if (imagePaths && imagePaths.length > 0) {
-      imageUrls = await Promise.all(
-        imagePaths.map((imagePath) =>
-          uploadImageToCloudinary(imagePath, "itemImages")
-        )
-      );
+    if (files && files.length > 0) {
+      const buffers = files.map((file) => file.buffer);
+      imageUrls = await updateImageInCloudinary(buffers, "itemImages", itemID);
     }
     await db
       .collection("admin")
@@ -196,4 +192,4 @@ export const updateItemQuantity = async (authDocId, itemId, quantity) => {
   } catch (error) {
     throw new Error(error.message || "Error updating item quantity");
   }
-}
+};

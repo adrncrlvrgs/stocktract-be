@@ -9,8 +9,10 @@ import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
+  const files = req.files; 
+  
   try {
-    const result = await createItem(req.body, authDocId);
+    const result = await createItem(req.body, authDocId, files);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
