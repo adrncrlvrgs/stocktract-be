@@ -1,5 +1,5 @@
 import express from "express";
-import * as activityLogController from "../core/logger/controller.js";
+import * as activityLogController from "../modules/activity-logs/controller.js";
 import { authenticate } from "../core/middlewares/middleware.js";
 
 const router = express.Router();
