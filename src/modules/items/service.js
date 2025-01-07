@@ -9,19 +9,19 @@ import path from "path";
 
 export const createItem = async (props, authDocId, files) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
-
-  console.log(files);
+  
+  let imageUrls = [];
   try {
     if (files && files.length > 0) {
       const buffers = files.map((file) => file.buffer);
-      imageUrls = await updateImageInCloudinary(buffers, "itemImages", itemID);
+      imageUrls = await uploadImageToCloudinary(buffers, "itemImages", itemID);
     }
     await db
       .collection("admin")
       .doc(authDocId)
       .collection("items")
       .add({
-        itemID,
+        itemID: Number(itemID),
         imageUrls,
         quantity: Number(quantity),
         ...rest,
