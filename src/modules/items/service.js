@@ -71,11 +71,12 @@ export const getItemById = async (itemId, authDocId) => {
 };
 
 export const updateItem = async (authDocId, itemId, props, files) => {
-  const { ...rest } = props;
+  const { quantity, ...rest } = props;
 
   try {
     const updateFields = {
       ...rest,
+      quantity: Number(quantity),
       updatedAt: new Date(),
     };
 
@@ -97,13 +98,11 @@ export const updateItem = async (authDocId, itemId, props, files) => {
     if (files && files.length > 0) {
       const existingImageUrls = itemData.imageUrls || [];
       const publicIds = existingImageUrls.map((url) => {
-
         const parts = url.split("/");
         const folder = parts[parts.length - 2];
         const fileName = parts[parts.length - 1].split(".")[0];
         return `itemImages/${folder}/itemImages/${folder}/${fileName}`;
       });
-
 
       const newImageUrls = await Promise.all(
         files.map(async (imagePath, index) => {
