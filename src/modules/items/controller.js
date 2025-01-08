@@ -1,15 +1,15 @@
-import { 
-  createItem, 
-  getAllItems, 
-  getItemById, 
-  updateItem, 
-  deleteItem 
+import {
+  createItem,
+  getAllItems,
+  getItemById,
+  updateItem,
+  deleteItem,
 } from "./service.js";
 import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
-  const files = req.files; 
+  const files = req.files;
 
   try {
     const result = await createItem(req.body, authDocId, files);
@@ -61,9 +61,10 @@ export const getItem = async (req, res) => {
 export const updateItemDetails = async (req, res) => {
   const { itemID } = req.params;
   const authDocId = req.user.userId;
+  const files = req.files;
 
   try {
-    const result = await updateItem(authDocId, itemID, req.body);
+    const result = await updateItem(authDocId, itemID, req.body, files);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);

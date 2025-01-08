@@ -9,7 +9,7 @@ import path from "path";
 
 export const createItem = async (props, authDocId, files) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
-  
+
   let imageUrls = [];
   try {
     if (files && files.length > 0) {
@@ -70,8 +70,8 @@ export const getItemById = async (itemId, authDocId) => {
   }
 };
 
-export const updateItem = async (authDocId, itemId, props) => {
-  const { imagePaths, ...rest } = props;
+export const updateItem = async (authDocId, itemId, props, files) => {
+  const { ...rest } = props;
 
   try {
     const updateFields = {
@@ -94,24 +94,34 @@ export const updateItem = async (authDocId, itemId, props) => {
     const itemDoc = itemSnapshot.docs[0];
     const itemData = itemDoc.data();
 
-    if (imagePaths && imagePaths.length > 0) {
+    if (files && files.length > 0) {
       const existingImageUrls = itemData.imageUrls || [];
-      const publicIds = existingImageUrls.map(
-        (url) => url.split("/").slice(-2).join("/").split(".")[0]
-      );
+      const publicIds = existingImageUrls.map((url) => {
+
+        const parts = url.split("/");
+        const folder = parts[parts.length - 2];
+        const fileName = parts[parts.length - 1].split(".")[0];
+        return `itemImages/${folder}/itemImages/${folder}/${fileName}`;
+      });
+
 
       const newImageUrls = await Promise.all(
-        imagePaths.map((imagePath, index) => {
+        files.map(async (imagePath, index) => {
           if (index < publicIds.length) {
-            return updateImageInCloudinary(publicIds[index], imagePath);
+            return await updateImageInCloudinary(publicIds[index], imagePath);
           } else {
-            return uploadImageToCloudinary(imagePath, "itemImages");
+            return await uploadImageToCloudinary(
+              [imagePath],
+              "itemImages",
+              itemId
+            );
           }
         })
       );
 
-      if (imagePaths.length < existingImageUrls.length) {
-        const extraPublicIds = publicIds.slice(imagePaths.length);
+      // Delete extra images if the new list is shorter
+      if (files.length < existingImageUrls.length) {
+        const extraPublicIds = publicIds.slice(files.length);
         await Promise.all(
           extraPublicIds.map((publicId) => deleteImageFromCloudinary(publicId))
         );
