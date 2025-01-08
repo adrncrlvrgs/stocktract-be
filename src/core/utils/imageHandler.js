@@ -59,18 +59,22 @@ export const uploadImageToCloudinary = async (files, folder, id) => {
 };
 
 /**
- * @param {Buffer|Buffer[]} publicIds - The public ID(s) of the image(s) to update.
- * @param {File|File[]} files - The File object(s) of the new image(s) to upload.
+ * @param {string|string[]} publicIds - The public ID(s) of the image(s) to update.
+ * @param {Buffer|Buffer[]} files - The Buffer(s) of the new image(s) to upload.
  * @returns {Promise<string|string[]>} - The URL(s) of the updated image(s).
  */
 export const updateImageInCloudinary = async (publicIds, files) => {
   try {
     if (Array.isArray(files)) {
+      const publicIdsArray = Array.isArray(publicIds) ? publicIds : [publicIds];
+
       const updatePromises = files.map((file, index) => {
         return new Promise((resolve, reject) => {
+          const publicId = publicIdsArray[index] || publicIdsArray[0];
+
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              public_id: publicIds[index],
+              public_id: publicId,
               overwrite: true,
             },
             (error, result) => {
@@ -89,6 +93,7 @@ export const updateImageInCloudinary = async (publicIds, files) => {
       const results = await Promise.all(updatePromises);
       return results;
     } else {
+      // Handle single file update
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
@@ -140,7 +145,6 @@ export const deleteImageFromCloudinary = async (publicIds) => {
 export const getImageDetailsFromCloudinary = async (publicIds) => {
   try {
     if (Array.isArray(publicIds)) {
-      // Handle multiple image details retrieval
       const detailPromises = publicIds.map((publicId) =>
         cloudinary.api.resource(publicId)
       );
