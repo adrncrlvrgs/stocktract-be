@@ -62,7 +62,7 @@ export const updateItemDetails = async (req, res) => {
   const { itemID } = req.params;
   const authDocId = req.user.userId;
   const files = req.files;
-
+ 
   try {
     const result = await updateItem(authDocId, itemID, req.body, files);
     return res.status(200).json(result);

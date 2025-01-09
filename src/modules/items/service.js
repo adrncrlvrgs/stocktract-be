@@ -13,8 +13,13 @@ export const createItem = async (props, authDocId, files) => {
   let imageUrls = [];
   try {
     if (files && files.length > 0) {
-      const buffers = files.map((file) => file.buffer);
-      imageUrls = await uploadImageToCloudinary(buffers, "itemImages", itemID);
+      imageUrls = await Promise.all(
+        files.map(async (file, index) => {
+          const publicId = `${itemID}_${index}`;
+          const folder = `itemImages/${itemID}`;
+          return await uploadImageToCloudinary(file.buffer, folder, publicId);
+        })
+      );
     }
     await db
       .collection("admin")
@@ -71,7 +76,7 @@ export const getItemById = async (itemId, authDocId) => {
 };
 
 export const updateItem = async (authDocId, itemId, props, files) => {
-  const { quantity, ...rest } = props;
+  const { quantity, existingImages, ...rest } = props;
 
   try {
     const updateFields = {
@@ -95,45 +100,50 @@ export const updateItem = async (authDocId, itemId, props, files) => {
     const itemDoc = itemSnapshot.docs[0];
     const itemData = itemDoc.data();
 
-    if (files && files.length > 0) {
-      const existingImageUrls = itemData.imageUrls || [];
-      const publicIds = existingImageUrls.map((url) => {
-        const parts = url.split("/");
-        const folder = parts[parts.length - 2];
-        const fileName = parts[parts.length - 1].split(".")[0];
-        return `itemImages/${folder}/itemImages/${folder}/${fileName}`;
-      });
+    const existingImageUrls = itemData.imageUrls || [];
 
-      const newImageUrls = await Promise.all(
-        files.map(async (imagePath, index) => {
-          if (index < publicIds.length) {
-            return await updateImageInCloudinary(publicIds[index], imagePath);
-          } else {
-            return await uploadImageToCloudinary(
-              [imagePath],
-              "itemImages",
-              itemId
-            );
-          }
+    const lastIndex = existingImageUrls.reduce((maxIndex, url) => {
+      const parts = url.split("/");
+      const fileName = parts[parts.length - 1].split(".")[0];
+      const index = parseInt(fileName.split("_")[1], 10);
+      return Math.max(maxIndex, index);
+    }, -1);
+
+    let newImageUrls = [];
+    if (files && files.length > 0) {
+      newImageUrls = await Promise.all(
+        files.map(async (file, index) => {
+          const newIndex = lastIndex + 1 + index;
+          const publicId = `${itemId}_${newIndex}`;
+          const folder = `itemImages/${itemId}`;
+          return await uploadImageToCloudinary(file.buffer, folder, publicId);
         })
       );
-
-      // Delete extra images if the new list is shorter
-      if (files.length < existingImageUrls.length) {
-        const extraPublicIds = publicIds.slice(files.length);
-        await Promise.all(
-          extraPublicIds.map((publicId) => deleteImageFromCloudinary(publicId))
-        );
-      }
-
-      updateFields.imageUrls = newImageUrls;
     }
+
+    const updatedImageUrls = [...(existingImages || []), ...newImageUrls];
+
+    const deletedImages = existingImageUrls.filter(
+      (url) => !updatedImageUrls.includes(url)
+    );
+
+    const deletedPublicIds = deletedImages.map((url) => {
+      const parts = url.split("/");
+      const folder = parts[parts.length - 2];
+      const fileName = parts[parts.length - 1].split(".")[0];
+      return `itemImages/${folder}/${fileName}`;
+    });
+
+    if (deletedPublicIds.length > 0) {
+      await deleteImageFromCloudinary(deletedPublicIds);
+    }
+
+    updateFields.imageUrls = updatedImageUrls;
 
     await itemDoc.ref.update(updateFields);
 
     return { message: "Item updated successfully" };
   } catch (error) {
-    console.error("Error updating item:", error.message);
     throw new Error(error.message || "Error updating item");
   }
 };
@@ -154,9 +164,12 @@ export const deleteItem = async (authDocId, itemId) => {
       const itemData = itemDoc.data();
 
       if (itemData.imageUrls && itemData.imageUrls.length > 0) {
-        const publicIds = itemData.imageUrls.map(
-          (url) => url.split("/").slice(-2).join("/").split(".")[0]
-        );
+        const publicIds = itemData.imageUrls.map((url) => {
+          const parts = url.split("/");
+          const folder = parts[parts.length - 2];
+          const fileName = parts[parts.length - 1].split(".")[0];
+          return `${folder}/${fileName}`;
+        });
         await Promise.all(
           publicIds.map((publicId) => deleteImageFromCloudinary(publicId))
         );

@@ -6,16 +6,15 @@ import streamifier from "streamifier";
  * @param {string} folder - The destination folder in Cloudinary.
  * @returns {Promise<string|string[]>} - The URL(s) of the uploaded image(s).
  */
-export const uploadImageToCloudinary = async (files, folder, id) => {
+export const uploadImageToCloudinary = async (files, folder, publicId) => {
   try {
     if (Array.isArray(files)) {
       const uploadPromises = files.map((file, index) => {
         return new Promise((resolve, reject) => {
-          const publicId = `${folder}/${id}/${id}_${index}`;
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder: `${folder}/${id}`,
-              public_id: publicId,
+              folder, // Specify the folder separately
+              public_id: publicId, // Only include the filename
               overwrite: true,
             },
             (error, result) => {
@@ -37,8 +36,8 @@ export const uploadImageToCloudinary = async (files, folder, id) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder,
-            public_id: id,
+            folder, // Specify the folder separately
+            public_id: publicId, // Only include the filename
             overwrite: true,
           },
           (error, result) => {
@@ -61,9 +60,10 @@ export const uploadImageToCloudinary = async (files, folder, id) => {
 /**
  * @param {string|string[]} publicIds - The public ID(s) of the image(s) to update.
  * @param {Buffer|Buffer[]} files - The Buffer(s) of the new image(s) to upload.
+ * @param {string} folder - The destination folder in Cloudinary.
  * @returns {Promise<string|string[]>} - The URL(s) of the updated image(s).
  */
-export const updateImageInCloudinary = async (publicIds, files) => {
+export const updateImageInCloudinary = async (publicIds, files, folder) => {
   try {
     if (Array.isArray(files)) {
       const publicIdsArray = Array.isArray(publicIds) ? publicIds : [publicIds];
@@ -74,7 +74,8 @@ export const updateImageInCloudinary = async (publicIds, files) => {
 
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              public_id: publicId,
+              folder, // Specify the folder separately
+              public_id: publicId, // Only include the filename
               overwrite: true,
             },
             (error, result) => {
@@ -97,7 +98,8 @@ export const updateImageInCloudinary = async (publicIds, files) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            public_id: publicIds,
+            folder, // Specify the folder separately
+            public_id: publicIds, // Only include the filename
             overwrite: true,
           },
           (error, result) => {
