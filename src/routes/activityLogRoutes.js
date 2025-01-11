@@ -4,7 +4,7 @@ import { authenticate } from "../core/middlewares/middleware.js";
 
 const router = express.Router();
 
-router.post('/log', authenticate, activityLogController.createlogActivity);
+router.post('/addlog', authenticate, activityLogController.createlogActivity);
 router.get('/', authenticate, activityLogController.getAllActivityLogs);
 
 export default router;

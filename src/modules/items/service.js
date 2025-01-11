@@ -5,12 +5,12 @@ import {
   updateImageInCloudinary,
   deleteImageFromCloudinary,
 } from "../../core/utils/imageHandler.js";
-import path from "path";
 
 export const createItem = async (props, authDocId, files) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
 
   let imageUrls = [];
+
   try {
     if (files && files.length > 0) {
       imageUrls = await Promise.all(

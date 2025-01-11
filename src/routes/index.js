@@ -15,6 +15,6 @@ router.use("/category", categoryRoutes);
 router.use("/items", itemRoutes);
 router.use("/sales", salesRoutes);
 router.use("/stocks", stockRoutes);
-router.use("/activitylog", activityLogRoutes);
+router.use("/logs", activityLogRoutes);
 
 export default router;
