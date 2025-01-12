@@ -2,16 +2,19 @@ import { db } from "../../config/admin.config.js";
 import { updateStockQuantity } from "../stocks/service.js";
 import {
   uploadImageToCloudinary,
-  updateImageInCloudinary,
   deleteImageFromCloudinary,
 } from "../../core/utils/imageHandler.js";
+import { logActivity } from "../activity-logs/service.js";
+import generateId from "../../core/utils/generateID.js";
 
-export const createItem = async (props, authDocId, files) => {
+export const createItem = async (props, authDocId, files, id) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
 
   let imageUrls = [];
 
   try {
+    const logID = generateId();
+
     if (files && files.length > 0) {
       imageUrls = await Promise.all(
         files.map(async (file, index) => {
@@ -35,6 +38,16 @@ export const createItem = async (props, authDocId, files) => {
       });
 
     await updateStockQuantity(authDocId, stockID, -Number(quantity));
+
+    await logActivity(
+      {
+        logID: logID,
+        userID: id,
+        action: "CREATE_ITEM",
+        details: `Item '${rest.item}' with ID ${itemID} created.`,
+      },
+      authDocId
+    );
     return { message: "Item created successfully" };
   } catch (error) {
     throw new Error(error.message || "Error creating item");
@@ -75,10 +88,11 @@ export const getItemById = async (itemId, authDocId) => {
   }
 };
 
-export const updateItem = async (authDocId, itemId, props, files) => {
+export const updateItem = async (authDocId, itemId, props, files, id) => {
   const { quantity, existingImages, ...rest } = props;
 
   try {
+    const logID = generateId();
     const updateFields = {
       ...rest,
       quantity: Number(quantity),
@@ -142,14 +156,25 @@ export const updateItem = async (authDocId, itemId, props, files) => {
 
     await itemDoc.ref.update(updateFields);
 
+    await logActivity(
+      {
+        logID: logID,
+        userID: id,
+        action: "UPDATE_ITEM",
+        details: `Item '${rest.item}' with ID ${itemId} updated.`,
+      },
+      authDocId
+    );
+
     return { message: "Item updated successfully" };
   } catch (error) {
     throw new Error(error.message || "Error updating item");
   }
 };
 
-export const deleteItem = async (authDocId, itemId) => {
+export const deleteItem = async (authDocId, itemId, id) => {
   try {
+    const logID = generateId();
     const itemIdAsNumber = Number(itemId);
 
     const itemSnapshot = await db
@@ -176,6 +201,16 @@ export const deleteItem = async (authDocId, itemId) => {
       }
 
       await itemDoc.ref.delete();
+
+      await logActivity(
+        {
+          logID: logID,
+          userID: id,
+          action: "DELETE_ITEM",
+          details: `Item '${itemData.name}' with ID ${itemId} deleted.`,
+        },
+        authDocId
+      );
 
       return { message: "Item and images deleted successfully" };
     } else {
