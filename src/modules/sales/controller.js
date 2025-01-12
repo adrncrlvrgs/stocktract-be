@@ -10,8 +10,9 @@ import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
+  const id = req.user.id;
   try {
-    const result = await createSale(req.body, authDocId);
+    const result = await createSale(req.body, authDocId, id);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
@@ -60,9 +61,10 @@ export const getSale = async (req, res) => {
 export const updateSaleDetails = async (req, res) => {
   const { saleID } = req.params;
   const authDocId = req.user.userId;
+  const id = req.user.id;
 
   try {
-    const result = await updateSale(authDocId, saleID, req.body);
+    const result = await updateSale(authDocId, saleID, req.body, id);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -75,9 +77,10 @@ export const updateSaleDetails = async (req, res) => {
 export const deleteSaleDetails = async (req, res) => {
   const { saleID } = req.params;
   const authDocId = req.user.userId;
+  const id = req.user.id;
 
   try {
-    const result = await deleteSale(authDocId, saleID);
+    const result = await deleteSale(authDocId, saleID, id);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
