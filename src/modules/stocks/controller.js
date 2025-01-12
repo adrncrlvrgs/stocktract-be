@@ -10,8 +10,9 @@ import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
+  const id = req.user.id;
   try {
-    const result = await createStock(req.body, authDocId);
+    const result = await createStock(req.body, authDocId, id);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
@@ -60,9 +61,10 @@ export const getStock = async (req, res) => {
 export const updateStockDetails = async (req, res) => {
   const { stockID } = req.params;
   const authDocId = req.user.userId;
+  const id = req.user.id;
 
   try {
-    const result = await updateStock(authDocId, stockID, req.body);
+    const result = await updateStock(authDocId, stockID, req.body, id);
     return res.status(200).json(result);
   } catch (error) {
     return res
@@ -74,9 +76,10 @@ export const updateStockDetails = async (req, res) => {
 export const removeStock = async (req, res) => {
   const { stockID } = req.params;
   const authDocId = req.user.userId;
+  const id = req.user.id;
 
   try {
-    const result = await deleteStock(authDocId, stockID);
+    const result = await deleteStock(authDocId, stockID, id);
     return res.status(200).json(result);
   } catch (error) {
     return res
