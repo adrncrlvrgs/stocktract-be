@@ -9,8 +9,9 @@ import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
   const authDocId = req.user.userId;
+  const id = req.user.id;
   try {
-    const result = await createCategory(req.body, authDocId);
+    const result = await createCategory(req.body, authDocId, id);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
@@ -60,9 +61,10 @@ export const getCategory = async (req, res) => {
 export const updateCategoryDetails = async (req, res) => {
   const { categoryID } = req.params;
   const authDocId = req.user.userId;
+  const id = req.user.id;
 
   try {
-    const result = await updateCategory(authDocId, categoryID, req.body);
+    const result = await updateCategory(authDocId, categoryID, req.body, id);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -75,9 +77,10 @@ export const updateCategoryDetails = async (req, res) => {
 export const removeCategory = async (req, res) => {
   const { categoryID } = req.params;
   const authDocId = req.user.userId;
+  const id = req.user.id;
 
   try {
-    const result = await deleteCategory(authDocId, categoryID);
+    const result = await deleteCategory(authDocId, categoryID, id);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);

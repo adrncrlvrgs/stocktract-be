@@ -1,14 +1,28 @@
 import { db } from "../../config/admin.config.js";
+import { logActivity } from "../activity-logs/service.js";
+import generateId from "../../core/utils/generateID.js";
 
-export const createCategory = async (props, authDocId) => {
+export const createCategory = async (props, authDocId, id) => {
   const { name, categoryID, status } = props;
+  console.log(id)
   try {
+    const logID = generateId()
     await db.collection("admin").doc(authDocId).collection("category").add({
       name,
       status: "Active",
       categoryID,
       createdAt: new Date(),
     });
+
+    await logActivity(
+      {
+        logID: logID,
+        userID: id,
+        action: "CREATE_CATEGORY",
+        details: `Category '${name}' with ID ${categoryID} created.`,
+      },
+      authDocId
+    );
 
     return { message: "Category created successfully" };
   } catch (error) {
@@ -50,10 +64,10 @@ export const getCategoryById = async (categoryId, authDocId) => {
   }
 };
 
-export const updateCategory = async (authDocId, categoryId, props) => {
+export const updateCategory = async (authDocId, categoryId, props, id) => {
   const { name } = props;
-
   try {
+    const logID = generateId();
     const updateFields = {
       name,
       updatedAt: new Date(),
@@ -71,6 +85,16 @@ export const updateCategory = async (authDocId, categoryId, props) => {
       const categoryDoc = categorySnapshot.docs[0];
 
       await categoryDoc.ref.update(updateFields);
+
+      await logActivity(
+        {
+          logID: logID,
+          userID: id,
+          action: "UPDATE_CATEGORY",
+          details: `Category '${name}' with ID ${categoryId} updated.`,
+        },
+        authDocId
+      );
       return { message: "Category updated successfully" };
     } else {
       throw new Error("No category found with that categoryID.");
@@ -80,8 +104,9 @@ export const updateCategory = async (authDocId, categoryId, props) => {
   }
 };
 
-export const deleteCategory = async (authDocId, categoryId) => {
+export const deleteCategory = async (authDocId, categoryId, id) => {
   try {
+    const logID = generateId();
     const categoryIdAsNumber = Number(categoryId);
     const categorySnapshot = await db
       .collection("admin")
@@ -92,8 +117,19 @@ export const deleteCategory = async (authDocId, categoryId) => {
 
     if (!categorySnapshot.empty) {
       const categoryDoc = categorySnapshot.docs[0];
+      const categoryData = categoryDoc.data();
 
       await categoryDoc.ref.delete();
+
+      await logActivity(
+        {
+          logID: logID,
+          userID: id,
+          action: "DELETE_CATEGORY",
+          details: `Category '${categoryData.name}' with ID ${categoryId} deleted.`,
+        },
+        authDocId
+      );
 
       return { message: "Category deleted successfully" };
     } else {

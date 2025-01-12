@@ -28,7 +28,6 @@ export const signUpUser = async (data) => {
 
 export const signInWithEmailAndPassword = async (email, password) => {
   try {
-    // Query Firestore collection for the user based on email
     const userSnapshot = await db
       .collection("admin")
       .where("email", "==", email)
@@ -50,6 +49,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
 
     const payload = {
       userId: userDoc.id,
+      id: userData.userID,
       email,
       role: userData.role || "user",
     };
@@ -96,7 +96,12 @@ export const refreshUserToken = async (oldToken) => {
 
     const userData = userSnapshot.docs[0].data();
     const newToken = jwt.sign(
-      { userId: decoded.userId, email: decoded.email, role: decoded.role },
+      {
+        userId: decoded.userId,
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
