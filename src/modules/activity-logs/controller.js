@@ -1,4 +1,5 @@
 import { logActivity, getActivityLogs } from "./service.js";
+import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const createlogActivity = async (req, res) => {
   try {
@@ -22,7 +23,7 @@ export const getAllActivityLogs = async (req, res) => {
       page: req.query.page || 1,
       orderBy: req.query.orderBy || "logID",
       order: req.query.order || "asc",
-      searchFields: ["logID", "activity"],
+      searchFields: ["logID", "userID"],
     });
 
     return res.status(200).json({ data, meta });
