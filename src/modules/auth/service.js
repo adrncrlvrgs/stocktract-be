@@ -10,12 +10,12 @@ export const signUpUser = async (data) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.collection("users").add({
+    await db.collection("admin").add({
       userID: userID,
       email,
       password: hashedPassword,
       name,
-      role,
+      role: "admin",
       status: "Active",
       createdAt: new Date(),
     });
@@ -26,12 +26,27 @@ export const signUpUser = async (data) => {
   }
 };
 
-export const signInWithEmailAndPassword = async (email, password) => {
+export const signInWithEmailAndPassword = async (email, password, role) => {
   try {
-    const userSnapshot = await db
-      .collection("admin")
-      .where("email", "==", email)
-      .get();
+    let userSnapshot;
+    switch (role) {
+      case "admin":
+        userSnapshot = await db
+          .collection("admin")
+          .where("email", "==", email)
+          .get();
+        break;
+
+      case "user":
+        userSnapshot = await db
+          .collection("users")
+          .where("email", "==", email)
+          .get();
+        break;
+
+      default:
+        throw new Error("Invalid role specified");
+    }
 
     if (userSnapshot.empty) {
       throw new Error("User not found");
@@ -52,6 +67,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
       id: userData.userID,
       email,
       role: userData.role,
+      adminDoc: role === "user" ? userData.adminDoc : null,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -85,10 +101,26 @@ export const getUserProfile = async (email) => {
 export const refreshUserToken = async (oldToken) => {
   try {
     const decoded = jwt.verify(oldToken, process.env.JWT_SECRET);
-    const userSnapshot = await db
-      .collection("admin")
-      .where("email", "==", decoded.email)
-      .get();
+    let userSnapshot;
+
+    switch (decoded.role) {
+      case "admin":
+        userSnapshot = await db
+          .collection("admin")
+          .where("email", "==", decoded.email)
+          .get();
+        break;
+
+      case "user":
+        userSnapshot = await db
+          .collection("users")
+          .where("email", "==", decoded.email)
+          .get();
+        break;
+
+      default:
+        throw new Error("Invalid role specified");
+    }
 
     if (userSnapshot.empty) {
       throw new Error("User not found");
@@ -101,6 +133,7 @@ export const refreshUserToken = async (oldToken) => {
         id: decoded.id,
         email: decoded.email,
         role: decoded.role,
+        adminDoc: decoded.role === "user" ? userData.adminDoc : null,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }

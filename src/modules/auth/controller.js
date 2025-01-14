@@ -18,11 +18,12 @@ export const signUp = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
   try {
     const { token, userData } = await signInWithEmailAndPassword(
       email,
-      password
+      password,
+      role
     );
     return res.status(200).json({ token, userData });
   } catch (error) {
