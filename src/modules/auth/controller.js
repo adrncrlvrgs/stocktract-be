@@ -37,8 +37,8 @@ export const getUserProfileController = async (req, res) => {
   try {
     const email = req.user.email;
 
-    const data = await getUserProfile(email);
-    return res.status(200).json({ data });
+    const { userData } = await getUserProfile(email);
+    return res.status(200).json({ userData });
   } catch (error) {
     console.error(error);
     return res
