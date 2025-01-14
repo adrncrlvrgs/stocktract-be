@@ -51,7 +51,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
       userId: userDoc.id,
       id: userData.userID,
       email,
-      role: userData.role || "user",
+      role: userData.role,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
