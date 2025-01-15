@@ -7,9 +7,12 @@ import {
 import { logActivity } from "../activity-logs/service.js";
 import generateId from "../../core/utils/generateID.js";
 
-export const createItem = async (props, authDocId, files, id) => {
+export const createItem = async (props, user, files) => {
   const { itemID, stockID, quantity, imagePaths, ...rest } = props;
 
+  const authDocId = user.userId;
+  const id = user.id;
+  
   let imageUrls = [];
 
   try {

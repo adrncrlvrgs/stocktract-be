@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const signUpUser = async (data) => {
-  const { userID, email, password, name, role } = data;
+  const { userID, email, password, name } = data;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -63,11 +63,10 @@ export const signInWithEmailAndPassword = async (email, password, role) => {
     }
 
     const payload = {
-      userId: userDoc.id,
+      userId: role === "admin" ? userDoc.id : userData.adminDoc,
       id: userData.userID,
       email,
       role: userData.role,
-      adminDoc: role === "user" ? userData.adminDoc : null,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -101,6 +100,7 @@ export const getUserProfile = async (email) => {
 export const refreshUserToken = async (oldToken) => {
   try {
     const decoded = jwt.verify(oldToken, process.env.JWT_SECRET);
+
     let userSnapshot;
 
     switch (decoded.role) {
@@ -133,7 +133,6 @@ export const refreshUserToken = async (oldToken) => {
         id: decoded.id,
         email: decoded.email,
         role: decoded.role,
-        adminDoc: decoded.role === "user" ? userData.adminDoc : null,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }

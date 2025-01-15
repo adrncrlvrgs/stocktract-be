@@ -8,12 +8,10 @@ import {
 import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
-  const authDocId = req.user.userId;
   const files = req.files;
-  const id = req.user.id;
 
   try {
-    const result = await createItem(req.body, authDocId, files,id);
+    const result = await createItem(req.body, req.user, files);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
@@ -64,7 +62,7 @@ export const updateItemDetails = async (req, res) => {
   const authDocId = req.user.userId;
   const files = req.files;
   const id = req.user.id;
- 
+
   try {
     const result = await updateItem(authDocId, itemID, req.body, files, id);
     return res.status(200).json(result);
@@ -82,7 +80,7 @@ export const deleteItemDetails = async (req, res) => {
   const id = req.user.id;
 
   try {
-    const result = await deleteItem(authDocId, itemID,id);
+    const result = await deleteItem(authDocId, itemID, id);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);

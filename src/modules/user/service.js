@@ -5,10 +5,10 @@ import {
   updateImageInCloudinary,
   deleteImageFromCloudinary,
 } from "../../core/utils/imageHandler.js";
-import path from "path";
 
-export const createUser = async (props, authDocId, file) => {
-  const { email, password, name, userID, role } = props;
+export const createUser = async (props, user, file) => {
+  const { email, password, name, userID } = props;
+  const authDocId = user.userId;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,20 +21,17 @@ export const createUser = async (props, authDocId, file) => {
         userID
       );
     }
-    await db
-      .collection("admin")
-      .doc(authDocId)
-      .collection("users")
-      .add({
-        email,
-        password: hashedPassword,
-        name,
-        role: "User",
-        status: "Active",
-        userID: Number(userID),
-        profileImageUrl,
-        createdAt: new Date(),
-      });
+    await db.collection("users").add({
+      email,
+      password: hashedPassword,
+      name,
+      role: "user",
+      status: "Active",
+      userID: Number(userID),
+      adminDoc: authDocId,
+      profileImageUrl,
+      createdAt: new Date(),
+    });
 
     return { message: "User created successfully" };
   } catch (error) {
@@ -44,24 +41,23 @@ export const createUser = async (props, authDocId, file) => {
 
 export const getAllUsers = (authDocId) => {
   try {
-    const usersSnapshot = db
-      .collection("admin")
-      .doc(authDocId)
-      .collection("users");
-
+    const usersSnapshot =  db
+    .collection("users")
+    .where("adminDoc", "==", authDocId) 
+    
     return usersSnapshot;
   } catch (error) {
     throw new Error(error.message || "Error fetching users");
   }
 };
 
-export const getUserById = async (userId, authDocId) => {
+export const getUserById = async (userId, user) => {
+  const authDocId = user.userId;
   try {
     const userIdAsNumber = Number(userId);
     const userSnapshot = await db
-      .collection("admin")
-      .doc(authDocId)
       .collection("users")
+      .where("adminDoc", "==", authDocId)
       .where("userID", "==", userIdAsNumber)
       .get();
 
@@ -76,8 +72,9 @@ export const getUserById = async (userId, authDocId) => {
   }
 };
 
-export const updateUser = async (authDocId, userId, props, file) => {
+export const updateUser = async (user, userId, props, file) => {
   const { name, email, password } = props;
+  const authDocId = user.userId;
 
   try {
     const updateFields = {
@@ -93,9 +90,8 @@ export const updateUser = async (authDocId, userId, props, file) => {
 
     const userIdAsNumber = Number(userId);
     const userSnapshot = await db
-      .collection("admin")
-      .doc(authDocId)
       .collection("users")
+      .where("adminDoc", "==", authDocId)
       .where("userID", "==", userIdAsNumber)
       .get();
 
@@ -128,14 +124,14 @@ export const updateUser = async (authDocId, userId, props, file) => {
   }
 };
 
-export const deleteUser = async (authDocId, userId) => {
+export const deleteUser = async (user, userId) => {
+  const authDocId = user.userId;
   try {
     const userIdAsNumber = Number(userId);
 
     const userSnapshot = await db
-      .collection("admin")
-      .doc(authDocId)
       .collection("users")
+      .where("adminDoc", "==", authDocId)
       .where("userID", "==", userIdAsNumber)
       .get();
 

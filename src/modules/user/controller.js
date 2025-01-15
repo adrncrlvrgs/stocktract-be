@@ -8,11 +8,10 @@ import {
 import { generateMeta } from "../../core/utils/generateMeta.js";
 
 export const create = async (req, res) => {
-  const authDocId = req.user.userId;
-  const file = req.file; 
+  const file = req.file;
 
   try {
-    const result = await createUser(req.body, authDocId, file);
+    const result = await createUser(req.body, req.user, file);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
@@ -46,10 +45,9 @@ export const getUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
   const { userID } = req.params;
-  const authDocId = req.user.userId;
 
   try {
-    const user = await getUserById(userID, authDocId);
+    const user = await getUserById(userID, req.user);
     return res.status(200).json(user);
   } catch (error) {
     console.error(error);
@@ -61,11 +59,10 @@ export const getUser = async (req, res) => {
 
 export const updateUserDetails = async (req, res) => {
   const { userID } = req.params;
-  const authDocId = req.user.userId;
-  const file = req.file; 
+  const file = req.file;
 
   try {
-    const result = await updateUser(authDocId, userID, req.body,file);
+    const result = await updateUser(req.user, userID, req.body, file);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -77,10 +74,9 @@ export const updateUserDetails = async (req, res) => {
 
 export const removeUser = async (req, res) => {
   const { userID } = req.params;
-  const authDocId = req.user.userId;
 
   try {
-    const result = await deleteUser(authDocId, userID);
+    const result = await deleteUser(req.user, userID);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
