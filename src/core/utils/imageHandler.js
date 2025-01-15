@@ -13,8 +13,8 @@ export const uploadImageToCloudinary = async (files, folder, publicId) => {
         return new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder, // Specify the folder separately
-              public_id: publicId, // Only include the filename
+              folder, 
+              public_id: publicId, 
               overwrite: true,
             },
             (error, result) => {
@@ -36,8 +36,8 @@ export const uploadImageToCloudinary = async (files, folder, publicId) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder, // Specify the folder separately
-            public_id: publicId, // Only include the filename
+            folder, 
+            public_id: publicId, 
             overwrite: true,
           },
           (error, result) => {
@@ -74,8 +74,8 @@ export const updateImageInCloudinary = async (publicIds, files, folder) => {
 
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder, // Specify the folder separately
-              public_id: publicId, // Only include the filename
+              folder, 
+              public_id: publicId, 
               overwrite: true,
             },
             (error, result) => {
@@ -94,12 +94,11 @@ export const updateImageInCloudinary = async (publicIds, files, folder) => {
       const results = await Promise.all(updatePromises);
       return results;
     } else {
-      // Handle single file update
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder, // Specify the folder separately
-            public_id: publicIds, // Only include the filename
+            folder, 
+            public_id: publicIds, 
             overwrite: true,
           },
           (error, result) => {

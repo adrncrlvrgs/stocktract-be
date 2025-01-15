@@ -2,21 +2,32 @@ import { db } from "../../config/admin.config.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { uploadImageToCloudinary } from "../../core/utils/imageHandler.js";
 
 dotenv.config();
 
-export const signUpUser = async (data) => {
+export const signUpUser = async (data, file) => {
   const { userID, email, password, name } = data;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    let profileImageUrl = "";
+    if (file) {
+      profileImageUrl = await uploadImageToCloudinary(
+        file.buffer,
+        "profileImages",
+        userID
+      );
+    }
     await db.collection("admin").add({
-      userID: userID,
+      userID: Number(userID),
       email,
       password: hashedPassword,
       name,
       role: "admin",
       status: "Active",
+      profileImageUrl,
       createdAt: new Date(),
     });
 

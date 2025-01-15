@@ -6,8 +6,9 @@ import {
 } from "./service.js";
 
 export const signUp = async (req, res) => {
+  const file = req.file;
   try {
-    const result = await signUpUser(req.body);
+    const result = await signUpUser(req.body, file);
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
