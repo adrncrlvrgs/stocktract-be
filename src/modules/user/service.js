@@ -7,13 +7,13 @@ import {
 } from "../../core/utils/imageHandler.js";
 
 export const createUser = async (props, user, file) => {
-  const { email, password, name, userID, firstName, lastName } = props;
+  const { email, password, userID, firstName, lastName } = props;
   const authDocId = user.userId;
 
   const formattedFirstName =
-  firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
-const formattedLastName =
-  lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+    firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+  const formattedLastName =
+    lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -79,12 +79,19 @@ export const getUserById = async (userId, user) => {
 };
 
 export const updateUser = async (user, userId, props, file) => {
-  const { name, email, password } = props;
+  const { firstName, lastName, status, email, password } = props;
   const authDocId = user.userId;
+
+  const formattedFirstName =
+    firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+  const formattedLastName =
+    lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
 
   try {
     const updateFields = {
-      name,
+      firstName: formattedFirstName,
+      lastName: formattedLastName,
+      status,
       email,
       updatedAt: new Date(),
     };

@@ -29,9 +29,9 @@ export const getUsers = async (req, res) => {
       search: req.query.search,
       limit: req.query.limit || 10,
       page: req.query.page || 1,
-      orderBy: req.query.orderBy || "name",
+      orderBy: req.query.orderBy || "firstName",
       order: req.query.order || "asc",
-      searchFields: ["name", "userID"],
+      searchFields: ["firstName", "userID"],
     });
 
     return res.status(200).json({ data, meta });

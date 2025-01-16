@@ -3,8 +3,9 @@ import { logActivity } from "../activity-logs/service.js";
 import generateId from "../../core/utils/generateID.js";
 
 export const createStock = async (props, authDocId, id) => {
-  const { stockID, supplier, item, totalQuantity, category, totalCost } = props;
+  const { stockID, item, category, totalQuantity, totalCost, ...rest } = props;
 
+  console.log(props);
   try {
     const logID = generateId();
     await db
@@ -13,12 +14,10 @@ export const createStock = async (props, authDocId, id) => {
       .collection("stocks")
       .add({
         stockID,
-        supplier,
         item,
-        category,
         totalQuantity: Number(totalQuantity),
-        totalCost,
-        status: "Active",
+        totalCost: Number(totalCost),
+        ...rest,
         createdAt: new Date(),
       });
 
