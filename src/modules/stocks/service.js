@@ -5,7 +5,6 @@ import generateId from "../../core/utils/generateID.js";
 export const createStock = async (props, authDocId, id) => {
   const { stockID, item, category, totalQuantity, totalCost, ...rest } = props;
 
-  console.log(props);
   try {
     const logID = generateId();
     await db
@@ -15,6 +14,7 @@ export const createStock = async (props, authDocId, id) => {
       .add({
         stockID,
         item,
+        category,
         totalQuantity: Number(totalQuantity),
         totalCost: Number(totalCost),
         ...rest,
@@ -72,10 +72,13 @@ export const getStockById = async (stockId, authDocId) => {
 };
 
 export const updateStock = async (authDocId, stockId, props, id) => {
+  const { totalQuantity, totalCost, ...rest } = props;
   try {
     const logID = generateId();
     const updateFields = {
-      ...props,
+      totalQuantity: Number(totalQuantity),
+      totalCost: Number(totalCost),
+      ...rest,
       updatedAt: new Date(),
     };
 
