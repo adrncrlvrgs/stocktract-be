@@ -13,8 +13,8 @@ export const uploadImageToCloudinary = async (files, folder, publicId) => {
         return new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder, 
-              public_id: publicId, 
+              folder,
+              public_id: publicId,
               overwrite: true,
             },
             (error, result) => {
@@ -36,8 +36,8 @@ export const uploadImageToCloudinary = async (files, folder, publicId) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder, 
-            public_id: publicId, 
+            folder,
+            public_id: publicId,
             overwrite: true,
           },
           (error, result) => {
@@ -74,8 +74,8 @@ export const updateImageInCloudinary = async (publicIds, files, folder) => {
 
           const uploadStream = cloudinary.uploader.upload_stream(
             {
-              folder, 
-              public_id: publicId, 
+              folder,
+              public_id: publicId,
               overwrite: true,
             },
             (error, result) => {
@@ -97,8 +97,8 @@ export const updateImageInCloudinary = async (publicIds, files, folder) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder, 
-            public_id: publicIds, 
+            folder,
+            public_id: publicIds,
             overwrite: true,
           },
           (error, result) => {
@@ -139,7 +139,6 @@ export const deleteImageFromCloudinary = async (publicIds) => {
 };
 
 /**
- * Gets details of images from Cloudinary.
  * @param {string|string[]} publicIds - The public ID(s) of the image(s).
  * @returns {Promise<object|object[]>} - The details of the image(s).
  */
@@ -158,5 +157,19 @@ export const getImageDetailsFromCloudinary = async (publicIds) => {
     }
   } catch (error) {
     throw new Error(`Failed to get image details: ${error.message}`);
+  }
+};
+
+/**
+
+ * @param {string} folderPath
+ * @returns {Promise<void>}
+ */
+export const deleteFolderFromCloudinary = async (folderPath) => {
+  try {
+    await cloudinary.api.delete_folder(folderPath);
+  } catch (error) {
+    console.error(`Error deleting folder ${folderPath}:`, error.message);
+    throw new Error(`Error deleting folder: ${error.message}`);
   }
 };

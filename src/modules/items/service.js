@@ -3,16 +3,16 @@ import { updateStockQuantity } from "../stocks/service.js";
 import {
   uploadImageToCloudinary,
   deleteImageFromCloudinary,
+  deleteFolderFromCloudinary,
 } from "../../core/utils/imageHandler.js";
 import { logActivity } from "../activity-logs/service.js";
 import generateId from "../../core/utils/generateID.js";
 
 export const createItem = async (props, user, files) => {
-  const { itemID, stockID, quantity, imagePaths, ...rest } = props;
-
+  const { itemID, stockID, quantity, price, imagePaths, tags, ...rest } = props;
+  const tagsArray = typeof tags === "string" ? tags.split(",") : [];
   const authDocId = user.userId;
   const id = user.id;
-  
   let imageUrls = [];
 
   try {
@@ -35,6 +35,8 @@ export const createItem = async (props, user, files) => {
         itemID: Number(itemID),
         imageUrls,
         quantity: Number(quantity),
+        price: Number(price),
+        tags: tagsArray,
         ...rest,
         status: "Active",
         createdAt: new Date(),
@@ -92,13 +94,14 @@ export const getItemById = async (itemId, authDocId) => {
 };
 
 export const updateItem = async (authDocId, itemId, props, files, id) => {
-  const { quantity, existingImages, ...rest } = props;
+  const { quantity, price, existingImages, ...rest } = props;
 
   try {
     const logID = generateId();
     const updateFields = {
       ...rest,
       quantity: Number(quantity),
+      price: Number(price),
       updatedAt: new Date(),
     };
 
@@ -176,10 +179,10 @@ export const updateItem = async (authDocId, itemId, props, files, id) => {
 };
 
 export const deleteItem = async (authDocId, itemId, id) => {
-  try {
-    const logID = generateId();
-    const itemIdAsNumber = Number(itemId);
+  const logID = generateId();
+  const itemIdAsNumber = Number(itemId);
 
+  try {
     const itemSnapshot = await db
       .collection("admin")
       .doc(authDocId)
@@ -187,38 +190,52 @@ export const deleteItem = async (authDocId, itemId, id) => {
       .where("itemID", "==", itemIdAsNumber)
       .get();
 
-    if (!itemSnapshot.empty) {
-      const itemDoc = itemSnapshot.docs[0];
-      const itemData = itemDoc.data();
-
-      if (itemData.imageUrls && itemData.imageUrls.length > 0) {
-        const publicIds = itemData.imageUrls.map((url) => {
-          const parts = url.split("/");
-          const folder = parts[parts.length - 2];
-          const fileName = parts[parts.length - 1].split(".")[0];
-          return `${folder}/${fileName}`;
-        });
-        await Promise.all(
-          publicIds.map((publicId) => deleteImageFromCloudinary(publicId))
-        );
-      }
-
-      await itemDoc.ref.delete();
-
-      await logActivity(
-        {
-          logID: logID,
-          userID: id,
-          action: "DELETE_ITEM",
-          details: `Item '${itemData.name}' with ID ${itemId} deleted.`,
-        },
-        authDocId
-      );
-
-      return { message: "Item and images deleted successfully" };
-    } else {
+    if (itemSnapshot.empty) {
       throw new Error("No item found with that itemID.");
     }
+
+    const itemDoc = itemSnapshot.docs[0];
+    const itemData = itemDoc.data();
+
+    if (itemData.imageUrls && itemData.imageUrls.length > 0) {
+      const publicIds = itemData.imageUrls
+        .map((url) => {
+          try {
+            if (!url.startsWith("http")) {
+              throw new Error(`Invalid URL: ${url}`);
+            }
+
+            const parts = url.split("/");
+            const folder = parts[parts.length - 2];
+            const fileName = parts[parts.length - 1].split(".")[0];
+            return `itemImages/${folder}/${fileName}`;
+          } catch (error) {
+            console.error(`Error parsing URL ${url}:`, error.message);
+            return null;
+          }
+        })
+        .filter((publicId) => publicId !== null);
+
+      await deleteImageFromCloudinary(publicIds);
+
+      const folderPath = publicIds[0].split("/").slice(0, 2).join("/");
+
+      await deleteFolderFromCloudinary(folderPath);
+    }
+
+    await itemDoc.ref.delete();
+
+    await logActivity(
+      {
+        logID: logID,
+        userID: id,
+        action: "DELETE_ITEM",
+        details: `Item '${itemData.name}' with ID ${itemId} deleted.`,
+      },
+      authDocId
+    );
+
+    return { message: "Item, images, and folder deleted successfully" };
   } catch (error) {
     throw new Error(error.message || "Error deleting item");
   }
