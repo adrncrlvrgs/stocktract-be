@@ -3,8 +3,7 @@ import { logActivity } from "../activity-logs/service.js";
 import generateId from "../../core/utils/generateID.js";
 
 export const createCategory = async (props, authDocId, id) => {
-  const { name, categoryID, status } = props;
-  console.log(id)
+  const { name, categoryID } = props;
   try {
     const logID = generateId()
     await db.collection("admin").doc(authDocId).collection("category").add({

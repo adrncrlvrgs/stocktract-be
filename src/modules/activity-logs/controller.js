@@ -1,7 +1,7 @@
 import { logActivity, getActivityLogs } from "./service.js";
 import { generateMeta } from "../../core/utils/generateMeta.js";
 
-export const createlogActivity = async (req, res) => {
+export const createLogActivity = async (req, res) => {
   try {
     const result = await logActivity(req.body);
     return res.status(201).json(result);

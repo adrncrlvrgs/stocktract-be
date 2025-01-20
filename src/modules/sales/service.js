@@ -18,7 +18,7 @@ export const createSale = async (props, authDocId, id) => {
         saleID,
         items,
         itemQuantity,
-        totalAmount: totalAmount.toFixed(2),
+        totalAmount: Number(totalAmount).toFixed(2),
         status: "Ordered",
         createdAt: new Date(),
       });

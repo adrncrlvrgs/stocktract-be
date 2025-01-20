@@ -16,7 +16,6 @@ const testUpdateUser = async () => {
 
   try {
     const result = await updateUser(authDocId, userId, props);
-    console.log(result);
   } catch (error) {
     console.error("Error updating user:", error.message);
   }

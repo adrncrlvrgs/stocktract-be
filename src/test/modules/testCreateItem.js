@@ -18,7 +18,6 @@ const testCreateItem = async () => {
 
   try {
     const result = await createItem(props, authDocId);
-    console.log(result);
   } catch (error) {
     console.error("Error creating item:", error.message);
   }

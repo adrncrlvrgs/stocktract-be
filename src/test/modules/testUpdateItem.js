@@ -17,7 +17,6 @@ const testUpdateItem = async () => {
 
   try {
     const result = await updateItem(authDocId, itemId, props);
-    console.log(result);
   } catch (error) {
     console.error("Error updating item:", error.message);
   }
