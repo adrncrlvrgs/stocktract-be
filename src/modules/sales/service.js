@@ -4,27 +4,33 @@ import { logActivity } from "../activity-logs/service.js";
 import generateId from "../../core/utils/generateID.js";
 
 export const createSale = async (props, authDocId, id) => {
-  const { saleID, itemID, item, quantity, totalAmount } = props;
+  const { saleID, items, itemQuantity } = props;
 
   try {
     const logID = generateId();
-    await db.collection("admin").doc(authDocId).collection("sales").add({
-      saleID,
-      item,
-      quantity,
-      totalAmount,
-      status: "Active",
-      createdAt: new Date(),
-    });
 
-    await updateItemQuantity(authDocId, itemID, -Number(quantity));
+    const totalAmount = items?.price * itemQuantity;
+    await db
+      .collection("admin")
+      .doc(authDocId)
+      .collection("sales")
+      .add({
+        saleID,
+        items,
+        itemQuantity,
+        totalAmount: totalAmount.toFixed(2),
+        status: "Ordered",
+        createdAt: new Date(),
+      });
+
+    await updateItemQuantity(authDocId, items?.itemID, -Number(itemQuantity));
 
     await logActivity(
       {
         logID: logID,
         userID: id,
         action: "CREATE_SALE",
-        details: `Sale '${saleID}' created for item '${item}' `,
+        details: `Sale '${saleID}' created for item '${items.item}' `,
       },
       authDocId
     );
@@ -69,15 +75,13 @@ export const getSaleById = async (saleId, authDocId) => {
   }
 };
 
-export const updateSale = async (authDocId, saleId, props) => {
-  const { item, quantity, totalAmount } = props;
+export const updateSale = async (authDocId, saleId, props, id) => {
+  const { status } = props;
 
   try {
     const logID = generateId();
     const updateFields = {
-      item,
-      quantity,
-      totalAmount,
+      status,
       updatedAt: new Date(),
     };
 
@@ -97,8 +101,8 @@ export const updateSale = async (authDocId, saleId, props) => {
         {
           logID: logID,
           userID: id,
-          action: "UPDATE_SALE",
-          details: `Sale '${saleId}' updated with new item '${item}', quantity ${quantity}.`,
+          action: "UPDATE_SALE_STATUS",
+          details: `Sale '${saleId}' updated with new status '${status}'.`,
         },
         authDocId
       );
@@ -111,7 +115,7 @@ export const updateSale = async (authDocId, saleId, props) => {
   }
 };
 
-export const deleteSale = async (authDocId, saleId) => {
+export const deleteSale = async (authDocId, saleId, id) => {
   try {
     const logID = generateId();
     const saleIdAsNumber = Number(saleId);
@@ -136,7 +140,7 @@ export const deleteSale = async (authDocId, saleId) => {
         },
         authDocId
       );
-      
+
       return { message: "Sale deleted successfully" };
     } else {
       throw new Error("No sale found with that saleID.");

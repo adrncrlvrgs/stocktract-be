@@ -38,7 +38,7 @@ export const createItem = async (props, user, files) => {
         price: Number(price),
         tags: tagsArray,
         ...rest,
-        status: "Active",
+        status: "Available",
         createdAt: new Date(),
       });
 
