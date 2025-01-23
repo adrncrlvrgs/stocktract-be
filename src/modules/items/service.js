@@ -38,6 +38,7 @@ export const createItem = async (props, user, files) => {
         price: Number(price),
         tags: tagsArray,
         ...rest,
+        stockID: Number(stockID),
         status: "Available",
         createdAt: new Date(),
       });
@@ -94,12 +95,13 @@ export const getItemById = async (itemId, authDocId) => {
 };
 
 export const updateItem = async (authDocId, itemId, props, files, id) => {
-  const { quantity, price, existingImages, ...rest } = props;
+  const { quantity, price, existingImages, stockID, ...rest } = props;
 
   try {
     const logID = generateId();
     const updateFields = {
       ...rest,
+      stockID: Number(stockID),
       quantity: Number(quantity),
       price: Number(price),
       updatedAt: new Date(),
@@ -119,6 +121,8 @@ export const updateItem = async (authDocId, itemId, props, files, id) => {
 
     const itemDoc = itemSnapshot.docs[0];
     const itemData = itemDoc.data();
+    const originalItemQuantity = itemData.quantity;
+    const quantityDifference = quantity - originalItemQuantity;
 
     const existingImageUrls = itemData.imageUrls || [];
 
@@ -161,6 +165,7 @@ export const updateItem = async (authDocId, itemId, props, files, id) => {
     updateFields.imageUrls = updatedImageUrls;
 
     await itemDoc.ref.update(updateFields);
+    await updateStockQuantity(authDocId, stockID, -Number(quantityDifference));
 
     await logActivity(
       {
